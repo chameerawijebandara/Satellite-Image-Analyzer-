@@ -24,10 +24,11 @@ Mat clone_image,image;
 
 int main( int argc, const char** argv )
 {
-	image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
+	cout << "First Image Number = ";
+	cin >> imagecount_p;
+	image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\img.jpg");
 	namedWindow("Mark the Lanes", WINDOW_NORMAL);
 	imshow("Mark the Lanes", image);
-
 	/*clone_image = image.clone();
 	namedWindow("Mark the Lanes", WINDOW_NORMAL);
 	DrawLines(image);
@@ -79,12 +80,12 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
 	char name[150];
 	if (event == EVENT_RBUTTONDOWN)
-	{
-		imagecount_p++;
+	{		
 		sprintf(name,"C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive\\%d.jpg",imagecount_p);
 		Rect margin(x-BOX_SIZE/2,y-BOX_SIZE/2,BOX_SIZE,BOX_SIZE);
 		imwrite(name,image(margin));
 		cout << "\tIMAGE SAVED";
+		imagecount_p++;
 	}
 	else if (event == EVENT_LBUTTONDOWN)
 	{
