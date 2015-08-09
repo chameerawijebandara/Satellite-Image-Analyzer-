@@ -11,36 +11,40 @@
 using namespace cv;
 using namespace std;
 
-#define BOX_SIZE 7
+#define BOX_SIZE 28
 
 void DrawLines(Mat img);
 void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 void DrawBox(Mat img,int x,int y);
-
+void Crop_and_Save(char *image_location,char *save_location);
 int current_x,current_y;
 int imagecount_p = 0;
 //int imagecount_n = 0;
 Mat clone_image,image;
+char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\mnist_train0.jpg";
+char *save_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Zeros";
 
 int main( int argc, const char** argv )
 {
 	cout << "First Image Number = ";
 	cin >> imagecount_p;
-	image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\img.jpg");
+	image = imread(image_directory);
 	namedWindow("Mark the Lanes", WINDOW_NORMAL);
 	imshow("Mark the Lanes", image);
+
 	/*clone_image = image.clone();
 	namedWindow("Mark the Lanes", WINDOW_NORMAL);
 	DrawLines(image);
 	imshow("Mark the Lanes", image);*/
 
-	setMouseCallback("Mark the Lanes", CallBackFunc, 0);
-	waitKey(0);
+	//setMouseCallback("Mark the Lanes", CallBackFunc, 0);
+	//waitKey(0);
+
+	Crop_and_Save(image_directory,save_directory);
 
 	return 0;
 
 }
-
 
 
 
@@ -78,10 +82,11 @@ int main( int argc, const char** argv )
 
 void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
+
 	char name[150];
 	if (event == EVENT_RBUTTONDOWN)
 	{		
-		sprintf(name,"C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive\\%d.jpg",imagecount_p);
+		sprintf(name,"%s\\%d.jpg",save_directory,imagecount_p);
 		Rect margin(x-BOX_SIZE/2,y-BOX_SIZE/2,BOX_SIZE,BOX_SIZE);
 		imwrite(name,image(margin));
 		cout << "\tIMAGE SAVED";
@@ -118,22 +123,22 @@ void DrawBox(Mat img,int x,int y)
 	{
 		for (int i = x-1-BOX_SIZE/2;  i <= x+1+BOX_SIZE/2; i++)
 		{
-			img.at<Vec3b>(Point(i,y-1-BOX_SIZE/2))[0] = 0;
+			img.at<Vec3b>(Point(i,y-1-BOX_SIZE/2))[0] = 255;
 			img.at<Vec3b>(Point(i,y-1-BOX_SIZE/2))[1] = 0;
 			img.at<Vec3b>(Point(i,y-1-BOX_SIZE/2))[2] = 0;
 
-			img.at<Vec3b>(Point(i,y+1+BOX_SIZE/2))[0] = 0;
+			img.at<Vec3b>(Point(i,y+1+BOX_SIZE/2))[0] = 255;
 			img.at<Vec3b>(Point(i,y+1+BOX_SIZE/2))[1] = 0;
 			img.at<Vec3b>(Point(i,y+1+BOX_SIZE/2))[2] = 0;
 		}
 
 		for (int i = y-1-BOX_SIZE/2;  i <= y+1+BOX_SIZE/2; i++)
 		{
-			img.at<Vec3b>(Point(x-1-BOX_SIZE/2,i))[0] = 0;
+			img.at<Vec3b>(Point(x-1-BOX_SIZE/2,i))[0] = 255;
 			img.at<Vec3b>(Point(x-1-BOX_SIZE/2,i))[1] = 0;
 			img.at<Vec3b>(Point(x-1-BOX_SIZE/2,i))[2] = 0;
 
-			img.at<Vec3b>(Point(x+1+BOX_SIZE/2,i))[0] = 0;
+			img.at<Vec3b>(Point(x+1+BOX_SIZE/2,i))[0] = 255;
 			img.at<Vec3b>(Point(x+1+BOX_SIZE/2,i))[1] = 0;
 			img.at<Vec3b>(Point(x+1+BOX_SIZE/2,i))[2] = 0;
 
@@ -173,6 +178,25 @@ void DrawLines(Mat img)
 				img.at<Vec3b>(Point(x,BOX_SIZE*y-1-i))[2] = 0;
 			}
 				
+		}
+	}
+}
+
+void Crop_and_Save(char *image_location,char *save_location)
+{
+	Mat read_image = imread(image_location);
+	char name[150];
+	for(int j = 0;j < read_image.rows/BOX_SIZE;j++)
+	{
+		for(int i = 0;i < read_image.cols/BOX_SIZE;i++)
+		{
+			
+			sprintf(name,"%s\\%d.jpg",save_directory,imagecount_p);
+			Rect margin(i*BOX_SIZE,j*BOX_SIZE,BOX_SIZE,BOX_SIZE);
+			imwrite(name,image(margin));
+			if(imagecount_p%100 == 0)
+				cout << imagecount_p << "\n";
+			imagecount_p++;
 		}
 	}
 }
