@@ -11,7 +11,7 @@
 using namespace cv;
 using namespace std;
 
-#define BOX_SIZE 28
+#define BOX_SIZE 7
 
 void DrawLines(Mat img);
 void CallBackFunc(int event, int x, int y, int flags, void* userdata);
@@ -21,8 +21,8 @@ int current_x,current_y;
 int imagecount_p = 0;
 //int imagecount_n = 0;
 Mat clone_image,image;
-char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\mnist_train0.jpg";
-char *save_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Zeros";
+char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\image2.jpg";
+char *save_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive";
 
 int main( int argc, const char** argv )
 {
@@ -37,10 +37,10 @@ int main( int argc, const char** argv )
 	DrawLines(image);
 	imshow("Mark the Lanes", image);*/
 
-	//setMouseCallback("Mark the Lanes", CallBackFunc, 0);
-	//waitKey(0);
+	setMouseCallback("Mark the Lanes", CallBackFunc, 0);
+	waitKey(0);
 
-	Crop_and_Save(image_directory,save_directory);
+	//Crop_and_Save(image_directory,save_directory);
 
 	return 0;
 

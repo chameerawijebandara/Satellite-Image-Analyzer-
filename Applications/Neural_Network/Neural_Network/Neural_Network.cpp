@@ -17,12 +17,13 @@ using namespace std;
 using namespace cv;
 /******************************************************************************/
  
-#define TRAINING_SAMPLES 12733       //Number of samples in training dataset
-#define ATTRIBUTES 784  //Number of pixels per sample.16X16
-#define TEST_SAMPLES 100      //Number of samples in test dataset
+#define TRAINING_SAMPLES 201       //Number of samples in training dataset
+#define ATTRIBUTES 49  //Number of pixels per sample.16X16
+#define TEST_SAMPLES 110      //Number of samples in test dataset
 #define CLASSES 2                  //Number of distinct labels.
-#define BOX_SIZE 28 
-int x = 0;
+#define BOX_SIZE 7 
+int tree_images = 120;
+int x = 0;		//for test
 /********************************************************************************
 This function will read the csv files(training and test dataset) and convert them
 into two matrices. classes matrix have 10 columns, one column for each class label. If the label of nth row in data matrix
@@ -45,7 +46,7 @@ void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_sa
 		img = imread(img_name);
 		cv::cvtColor(img,scan_img,CV_RGB2GRAY);
 		   //for each attribute in the row
-		if(row < 6805)
+		if(row < tree_images)
 		{
 			classes.at<float>(row,1) = 1.0;
 			classes.at<float>(row,0) = 0;
@@ -73,7 +74,7 @@ void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_sa
 			//}
 		}
 
-		cout << row <<"\n";
+		//cout << row <<"\n";
     }
  
     //fclose(inputfile);
@@ -89,7 +90,6 @@ void create_dataset(char *filename, cv::Mat &data)
 	img = imread(filename);
 	cv::cvtColor(img,scan_img,CV_RGB2GRAY);
 	data = Mat((scan_img.rows+1-BOX_SIZE)*(scan_img.cols+1-BOX_SIZE),BOX_SIZE*BOX_SIZE,CV_32F);
-	data = Scalar(500);
    
     //read each row of the csv file
 	for(int row = 0; row < scan_img.rows+1-BOX_SIZE; row++)
@@ -99,9 +99,11 @@ void create_dataset(char *filename, cv::Mat &data)
 			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++)
 			{	
 				pixelvalue = (float)scan_img.at<uchar>(row+j/BOX_SIZE,col+j%BOX_SIZE);
-					data.at<float>(row*col+col,j) = pixelvalue;
-					if(pixelvalue<0)
+				data.at<float>(row*col+col,j) = pixelvalue;
+					//for test
+					if(pixelvalue<0)		
 						x = 5;
+					/////////////////
 			}
 		}
     }
@@ -126,9 +128,13 @@ int main( int argc, char** argv )
 	//
 	cv::Mat classificationResult(1, CLASSES, CV_32F);
 	//load the training and test data sets.
-	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Digits", training_set, training_set_classifications, TRAINING_SAMPLES);
-	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Zeros", test_set, test_set_classifications, TEST_SAMPLES);
+	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
+	tree_images = 90;
+	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Test", test_set, test_set_classifications, TEST_SAMPLES);
 	//create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set);
+	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
+	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
+	dot_image = Scalar(0);
 	
 		// define the structure for the neural network (MLP)
 		// The neural network has 3 layers.
@@ -178,7 +184,7 @@ int main( int argc, char** argv )
  
     //classification matrix gives the count of classes to which the samples were classified.
     int classification_matrix[CLASSES][CLASSES]={{}};
-		
+	int count = 0;
     // for each sample in the test set.
     for (int tsample = 0; tsample < test_set.rows; tsample++) {
  
@@ -202,8 +208,24 @@ int main( int argc, char** argv )
                 maxIndex=index;
             }
         }
- 
-        printf("Testing Sample %i -> class result (digit %d)\n", tsample, maxIndex);
+		
+		int row = tsample/(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2, 
+				col = tsample%(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2;
+		if(maxIndex == 1){
+			count++;
+			test_image.at<Vec3b>(Point(col,row))[0] = 255;
+			test_image.at<Vec3b>(Point(col,row))[1] = 0;
+			test_image.at<Vec3b>(Point(col,row))[2] = 0;
+
+			dot_image.at<float>(Point(col,row)) = 255;
+			//printf("Found at row %d  %d %d\n", tsample,row,col);
+
+		}
+
+		else{
+			dot_image.at<float>(Point(col,row)) = 0;
+		}
+        //printf("Testing Sample %i -> class result (digit %d  %f  %f)\n", tsample,maxIndex, classificationResult.at<float>(0,0),classificationResult.at<float>(0,1));
  
         //Now compare the predicted class to the actural class. if the prediction is correct then\
         //test_set_classifications[tsample][ maxIndex] should be 1.
@@ -231,6 +253,12 @@ int main( int argc, char** argv )
             classification_matrix[maxIndex][maxIndex]++;
         }
     }
+
+	cout << "COUNT = " << count;
+	namedWindow("show",WINDOW_NORMAL);
+	imshow("show",test_image);waitKey(1);
+	namedWindow("sho",WINDOW_NORMAL);
+	imshow("sho",dot_image);waitKey(0);
 	cout << "\n\n";
     printf( "\nResults on the testing dataset\n"
     "\tCorrect classification: %d (%g%%)\n"
@@ -252,7 +280,8 @@ int main( int argc, char** argv )
         }
         cout<<"\n";
     }
-		
+	
+	//for test
 	float pixelvalue;
 	for(int row = 0; row < test_set.rows; row++)
 	{	
@@ -272,6 +301,8 @@ int main( int argc, char** argv )
 	{
 		cout << i <<" = "<< m[i] <<"\n";
 	}
+	/////////////////////////////////
+
 	int a;
 	cin >> a;
     return 0;
