@@ -21,7 +21,7 @@ int current_x,current_y;
 int imagecount_p = 0;
 //int imagecount_n = 0;
 Mat clone_image,image;
-char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\image2.jpg";
+char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\img.jpg";
 char *save_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive";
 
 int main( int argc, const char** argv )

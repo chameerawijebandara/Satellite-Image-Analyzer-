@@ -17,9 +17,9 @@ using namespace std;
 using namespace cv;
 /******************************************************************************/
  
-#define TRAINING_SAMPLES 201       //Number of samples in training dataset
-#define ATTRIBUTES 49  //Number of pixels per sample.16X16
-#define TEST_SAMPLES 110      //Number of samples in test dataset
+#define TRAINING_SAMPLES 281       //Number of samples in training dataset
+#define ATTRIBUTES 49  //Number of pixels per sample.7X7
+#define TEST_SAMPLES 900      //Number of samples in test dataset
 #define CLASSES 2                  //Number of distinct labels.
 #define BOX_SIZE 7 
 int tree_images = 120;
@@ -73,7 +73,7 @@ void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_sa
  
 			//}
 		}
-
+		cout << img_name <<"\n";
 		//cout << row <<"\n";
     }
  
@@ -89,26 +89,42 @@ void create_dataset(char *filename, cv::Mat &data)
 	cv::Mat scan_img,img;
 	img = imread(filename);
 	cv::cvtColor(img,scan_img,CV_RGB2GRAY);
+
+	cv::Mat gray_dot_img,dot_img;
+	dot_img = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
+	cv::cvtColor(dot_img,gray_dot_img,CV_RGB2GRAY);
+
 	data = Mat((scan_img.rows+1-BOX_SIZE)*(scan_img.cols+1-BOX_SIZE),BOX_SIZE*BOX_SIZE,CV_32F);
    
     //read each row of the csv file
+	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
 	for(int row = 0; row < scan_img.rows+1-BOX_SIZE; row++)
 	{	
 		for(int col = 0; col < scan_img.cols+1-BOX_SIZE; col++)
 		{
+			if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
+				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[0] = 0;
+				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[1] = 0;
+				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[2] = 255;
+				cout << col+BOX_SIZE/2<<"   "<<row+BOX_SIZE/2<<"\n";
+			}
 			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++)
 			{	
-				pixelvalue = (float)scan_img.at<uchar>(row+j/BOX_SIZE,col+j%BOX_SIZE);
+				
+				if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
+					pixelvalue = (float)scan_img.at<uchar>(row+j/BOX_SIZE,col+j%BOX_SIZE);
+				}
+				else
+					pixelvalue = 0.0;
+
 				data.at<float>(row*col+col,j) = pixelvalue;
-					//for test
-					if(pixelvalue<0)		
-						x = 5;
-					/////////////////
 			}
 		}
     }
  
- 
+	namedWindow("aa",WINDOW_NORMAL);
+	imshow("aa",test_image);
+	waitKey(0);
 }
  
 /******************************************************************************/
@@ -130,12 +146,29 @@ int main( int argc, char** argv )
 	//load the training and test data sets.
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
 	tree_images = 90;
-	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Test", test_set, test_set_classifications, TEST_SAMPLES);
+	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
 	//create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set);
 	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
 	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
 	dot_image = Scalar(0);
+
+	cv::Mat gray_dot_img,dot_img;
+	dot_img = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
+	cv::cvtColor(dot_img,gray_dot_img,CV_RGB2GRAY);
+	for(int row = 0; row < test_image.rows; row++)
+	{	
+		for(int col = 0; col < test_image.cols; col++)
+		{
+			if((float)gray_dot_img.at<uchar>(row,col)>200.0f){
+				//circle(test_image, Point(col,row),  3, Scalar(0,0,255), 1, 0, 0);
+				test_image.at<Vec3b>(Point(col,row))[0] = 0;
+				test_image.at<Vec3b>(Point(col,row))[1] = 0;
+				test_image.at<Vec3b>(Point(col,row))[2] = 255;
 	
+			}
+		}
+    }
+
 		// define the structure for the neural network (MLP)
 		// The neural network has 3 layers.
 		// - one input node per attribute in a sample so 256 input nodes
@@ -258,7 +291,7 @@ int main( int argc, char** argv )
 	namedWindow("show",WINDOW_NORMAL);
 	imshow("show",test_image);waitKey(1);
 	namedWindow("sho",WINDOW_NORMAL);
-	imshow("sho",dot_image);waitKey(0);
+	imshow("sho",dot_image);waitKey(1);
 	cout << "\n\n";
     printf( "\nResults on the testing dataset\n"
     "\tCorrect classification: %d (%g%%)\n"
