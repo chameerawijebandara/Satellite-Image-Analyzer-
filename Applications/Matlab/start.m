@@ -35,7 +35,7 @@ for i=1: r
     imwrite(k,str);
    end
 end
-figure,imshow(J);%viscircles(centers,radii);
+figure,imshow(J);viscircles(centers,radii);
 
 imwrite(uint8(temp),'C:\Users\Dell\Desktop\Tree_project\Matlab_image.jpg');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

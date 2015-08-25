@@ -59,25 +59,11 @@ void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_sa
 		
 		for(int col = 0; col <ATTRIBUTES; col++)
 		{
-			//if its the pixel value.
-			//if (col < ATTRIBUTES){
- 
-			//    fscanf(inputfile, "%f,", &pixelvalue);
 			pixelvalue = (float)scan_img.at<uchar>(col/BOX_SIZE,col%BOX_SIZE);
 			data.at<float>(row,col) = pixelvalue;
-			//}//if its the label
-			//else if (col == ATTRIBUTES){
-			//    //make the value of label column in that row as 1.
-			//    fscanf(inputfile, "%i", &label);
-			//    classes.at<float>(row,label) = 1.0;
- 
-			//}
+			
 		}
-		cout << img_name <<"\n";
-		//cout << row <<"\n";
     }
- 
-    //fclose(inputfile);
  
 }
 
@@ -98,6 +84,7 @@ void create_dataset(char *filename, cv::Mat &data)
    
     //read each row of the csv file
 	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
+	int a =0;
 	for(int row = 0; row < scan_img.rows+1-BOX_SIZE; row++)
 	{	
 		for(int col = 0; col < scan_img.cols+1-BOX_SIZE; col++)
@@ -106,22 +93,30 @@ void create_dataset(char *filename, cv::Mat &data)
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[0] = 0;
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[1] = 0;
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[2] = 255;
-				cout << col+BOX_SIZE/2<<"   "<<row+BOX_SIZE/2<<"\n";
+				//cout << col +1+ BOX_SIZE/2<<"   "<<row +1+ BOX_SIZE/2<<"\n";
+				
 			}
 			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++)
 			{	
-				
 				if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
 					pixelvalue = (float)scan_img.at<uchar>(row+j/BOX_SIZE,col+j%BOX_SIZE);
+					if(!a){
+						if(j/7==0||j%7==6||j%7==0||j/7==6)
+						{
+							test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[0] = 255;
+							test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[1] = 0;
+							test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;
+						}
+					}
 				}
 				else
-					pixelvalue = 0.0;
+					pixelvalue = 0.0f;
 
-				data.at<float>(row*col+col,j) = pixelvalue;
+				data.at<float>(row*(scan_img.cols+1-BOX_SIZE)+col,j) = pixelvalue;
 			}
 		}
     }
- 
+	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Result2.png",test_image);
 	namedWindow("aa",WINDOW_NORMAL);
 	imshow("aa",test_image);
 	waitKey(0);
@@ -147,7 +142,7 @@ int main( int argc, char** argv )
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
 	tree_images = 90;
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
-	//create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set);
+	create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set);
 	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
 	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
 	dot_image = Scalar(0);
@@ -164,7 +159,6 @@ int main( int argc, char** argv )
 				test_image.at<Vec3b>(Point(col,row))[0] = 0;
 				test_image.at<Vec3b>(Point(col,row))[1] = 0;
 				test_image.at<Vec3b>(Point(col,row))[2] = 255;
-	
 			}
 		}
     }
@@ -219,8 +213,9 @@ int main( int argc, char** argv )
     int classification_matrix[CLASSES][CLASSES]={{}};
 	int count = 0;
     // for each sample in the test set.
+	int ts;
     for (int tsample = 0; tsample < test_set.rows; tsample++) {
- 
+		ts = tsample;
         // extract the sample
         test_sample = test_set.row(tsample);
  
@@ -234,7 +229,8 @@ int main( int argc, char** argv )
         float value = 0.0f;
         float maxValue = classificationResult.at<float>(0,0);
         for(int index=1;index<CLASSES;index++)
-        {   value = classificationResult.at<float>(0,index);
+        {   
+			value = classificationResult.at<float>(0,index);
             if(value>maxValue)
             {   
 				maxValue = value;
@@ -243,12 +239,13 @@ int main( int argc, char** argv )
         }
 		
 		int row = tsample/(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2, 
-				col = tsample%(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2;
+			col = tsample%(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2;
+
 		if(maxIndex == 1){
 			count++;
-			test_image.at<Vec3b>(Point(col,row))[0] = 255;
-			test_image.at<Vec3b>(Point(col,row))[1] = 0;
-			test_image.at<Vec3b>(Point(col,row))[2] = 0;
+			cout << tsample << "  "<< row <<"  "<< col <<"  "<< test_image.cols+1-BOX_SIZE << " \n";
+			test_image.at<Vec3b>(Point(col,row))[0] = 0;
+			test_image.at<Vec3b>(Point(col,row))[1] = 255;
 
 			dot_image.at<float>(Point(col,row)) = 255;
 			//printf("Found at row %d  %d %d\n", tsample,row,col);
@@ -256,7 +253,7 @@ int main( int argc, char** argv )
 		}
 
 		else{
-			dot_image.at<float>(Point(col,row)) = 0;
+				dot_image.at<float>(Point(col,row)) = 0;
 		}
         //printf("Testing Sample %i -> class result (digit %d  %f  %f)\n", tsample,maxIndex, classificationResult.at<float>(0,0),classificationResult.at<float>(0,1));
  
@@ -286,7 +283,7 @@ int main( int argc, char** argv )
             classification_matrix[maxIndex][maxIndex]++;
         }
     }
-
+	cout << "COUNT = " << ts<<"\n";
 	cout << "COUNT = " << count;
 	namedWindow("show",WINDOW_NORMAL);
 	imshow("show",test_image);waitKey(1);
