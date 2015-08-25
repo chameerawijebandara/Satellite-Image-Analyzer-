@@ -69,7 +69,7 @@ void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_sa
 
 /******************************************************************************/
 
-void create_dataset(char *filename, cv::Mat &data)
+void create_dataset(char *filename, cv::Mat &data,cv::Mat &test_image,char *matlab_image_name)
 {
     float pixelvalue;
 	cv::Mat scan_img,img;
@@ -77,14 +77,14 @@ void create_dataset(char *filename, cv::Mat &data)
 	cv::cvtColor(img,scan_img,CV_RGB2GRAY);
 
 	cv::Mat gray_dot_img,dot_img;
-	dot_img = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
+	dot_img = imread(matlab_image_name);
 	cv::cvtColor(dot_img,gray_dot_img,CV_RGB2GRAY);
 
 	data = Mat((scan_img.rows+1-BOX_SIZE)*(scan_img.cols+1-BOX_SIZE),BOX_SIZE*BOX_SIZE,CV_32F);
    
     //read each row of the csv file
-	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
-	int a =0;
+	test_image = imread(filename);
+
 	for(int row = 0; row < scan_img.rows+1-BOX_SIZE; row++)
 	{	
 		for(int col = 0; col < scan_img.cols+1-BOX_SIZE; col++)
@@ -92,22 +92,20 @@ void create_dataset(char *filename, cv::Mat &data)
 			if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[0] = 0;
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[1] = 0;
-				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[2] = 255;
-				//cout << col +1+ BOX_SIZE/2<<"   "<<row +1+ BOX_SIZE/2<<"\n";
-				
+				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[2] = 255;				
 			}
 			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++)
 			{	
 				if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
 					pixelvalue = (float)scan_img.at<uchar>(row+j/BOX_SIZE,col+j%BOX_SIZE);
-					if(!a){
-						if(j/7==0||j%7==6||j%7==0||j/7==6)
-						{
-							test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[0] = 255;
-							test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[1] = 0;
-							test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;
-						}
+					//draw a BLUE box around the detected circles from Matlab code
+					if(j/7==0||j%7==6||j%7==0||j/7==6)
+					{
+						test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[0] = 255;
+						test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[1] = 0;
+						test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;
 					}
+					
 				}
 				else
 					pixelvalue = 0.0f;
@@ -116,10 +114,6 @@ void create_dataset(char *filename, cv::Mat &data)
 			}
 		}
     }
-	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Result2.png",test_image);
-	namedWindow("aa",WINDOW_NORMAL);
-	imshow("aa",test_image);
-	waitKey(0);
 }
  
 /******************************************************************************/
@@ -142,11 +136,14 @@ int main( int argc, char** argv )
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
 	tree_images = 90;
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
-	create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set);
-	cv::Mat test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
+	cv::Mat test_image;
+	create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set,test_image,"C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
+	
+	//create a black image to mark detected trees
 	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
 	dot_image = Scalar(0);
 
+	//
 	cv::Mat gray_dot_img,dot_img;
 	dot_img = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
 	cv::cvtColor(dot_img,gray_dot_img,CV_RGB2GRAY);
@@ -155,14 +152,13 @@ int main( int argc, char** argv )
 		for(int col = 0; col < test_image.cols; col++)
 		{
 			if((float)gray_dot_img.at<uchar>(row,col)>200.0f){
-				//circle(test_image, Point(col,row),  3, Scalar(0,0,255), 1, 0, 0);
 				test_image.at<Vec3b>(Point(col,row))[0] = 0;
 				test_image.at<Vec3b>(Point(col,row))[1] = 0;
 				test_image.at<Vec3b>(Point(col,row))[2] = 255;
 			}
 		}
     }
-
+	test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
 		// define the structure for the neural network (MLP)
 		// The neural network has 3 layers.
 		// - one input node per attribute in a sample so 256 input nodes
@@ -238,16 +234,29 @@ int main( int argc, char** argv )
             }
         }
 		
-		int row = tsample/(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2, 
-			col = tsample%(test_image.cols+1-BOX_SIZE) + BOX_SIZE/2;
+		int row = tsample/(test_image.cols+1-BOX_SIZE), 
+			col = tsample%(test_image.cols+1-BOX_SIZE);
 
 		if(maxIndex == 1){
 			count++;
-			cout << tsample << "  "<< row <<"  "<< col <<"  "<< test_image.cols+1-BOX_SIZE << " \n";
-			test_image.at<Vec3b>(Point(col,row))[0] = 0;
-			test_image.at<Vec3b>(Point(col,row))[1] = 255;
+			cout << tsample << "  "<< row +1<<"  "<< col +1<<"  "<< test_image.cols+1-BOX_SIZE << " \n";
 
+			//Mark detected trees in white dots on the black image
 			dot_image.at<float>(Point(col,row)) = 255;
+
+			//Mark a dot on the tree
+			test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[0] = 15;
+			test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[1] = 185;
+			test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[2] = 255;
+
+			//draw a GREEN box around the detected trees
+			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++){
+				//if(j/7==0||j%7==6||j%7==0||j/7==6){
+					test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[0] = 0;
+					test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[1] = 255;
+					test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;
+				//}
+			}
 			//printf("Found at row %d  %d %d\n", tsample,row,col);
 
 		}
@@ -285,10 +294,13 @@ int main( int argc, char** argv )
     }
 	cout << "COUNT = " << ts<<"\n";
 	cout << "COUNT = " << count;
-	namedWindow("show",WINDOW_NORMAL);
-	imshow("show",test_image);waitKey(1);
-	namedWindow("sho",WINDOW_NORMAL);
-	imshow("sho",dot_image);waitKey(1);
+	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result4.png",test_image);
+	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result5.png",dot_image);
+	namedWindow("Trees",WINDOW_NORMAL);
+	imshow("Trees",test_image);waitKey(1);
+	namedWindow("Trees as Dots",WINDOW_NORMAL);
+	imshow("Trees as Dots",dot_image);waitKey(0);
+
 	cout << "\n\n";
     printf( "\nResults on the testing dataset\n"
     "\tCorrect classification: %d (%g%%)\n"
@@ -324,14 +336,6 @@ int main( int argc, char** argv )
 	}
 	cout << "x = "<< x << "\n\n";
 
-	//cout << test_set.row(33)<<"\n\n";
-	double *m;
-	m = nnetwork.get_weights(0);
-	for(int i = 0;i<4;i++)
-	{
-		cout << i <<" = "<< m[i] <<"\n";
-	}
-	/////////////////////////////////
 
 	int a;
 	cin >> a;
