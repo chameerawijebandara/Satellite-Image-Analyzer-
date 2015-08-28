@@ -21,7 +21,7 @@ int current_x,current_y;
 int imagecount_p = 0;
 //int imagecount_n = 0;
 Mat clone_image,image;
-char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\img.jpg";
+char *image_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result7.png";
 char *save_directory = "C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive";
 
 int main( int argc, const char** argv )
@@ -88,7 +88,7 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 	{		
 		sprintf(name,"%s\\%d.jpg",save_directory,imagecount_p);
 		Rect margin(x-BOX_SIZE/2,y-BOX_SIZE/2,BOX_SIZE,BOX_SIZE);
-		imwrite(name,image(margin));
+//		imwrite(name,image(margin));
 		cout << "\tIMAGE SAVED";
 		imagecount_p++;
 	}
@@ -96,7 +96,7 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 	{
 		current_x = x;
 		current_y = y;
-		cout<<"\n"<<"x = "<<x<<"\t\t"<<"y = "<<y;
+		cout<<"\n"<<"x = "<<x<<"\t\t"<<"y = "<<y<<"\n";
 		clone_image = image.clone();
 		DrawBox(clone_image,x,y);
 		namedWindow("Mark the Lanes", WINDOW_NORMAL);
@@ -119,8 +119,18 @@ void DrawBox(Mat img,int x,int y)
 	int width,height;
 	width = img.cols;
 	height = img.rows;
+	Mat gray_img;
+	cv::cvtColor(img,gray_img,CV_RGB2GRAY);
 	if(x>BOX_SIZE/2 && y>BOX_SIZE/2 && x<width-1-BOX_SIZE/2 && y<height-1-BOX_SIZE/2)
 	{
+		cout << "\n";
+		for (int i = x-1-BOX_SIZE/2;  i <= x+1+BOX_SIZE/2; i++){
+			cout << "\n";
+			for (int j = y-1-BOX_SIZE/2;  j <= y+1+BOX_SIZE/2; j++){
+				cout << (float)gray_img.at<uchar>(Point(i,j))<<"\t";
+			}
+			
+		}
 		for (int i = x-1-BOX_SIZE/2;  i <= x+1+BOX_SIZE/2; i++)
 		{
 			img.at<Vec3b>(Point(i,y-1-BOX_SIZE/2))[0] = 255;
@@ -143,6 +153,8 @@ void DrawBox(Mat img,int x,int y)
 			img.at<Vec3b>(Point(x+1+BOX_SIZE/2,i))[2] = 0;
 
 		}
+
+
 	}
 }
 

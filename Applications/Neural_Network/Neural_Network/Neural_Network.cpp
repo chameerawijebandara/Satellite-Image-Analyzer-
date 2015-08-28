@@ -115,7 +115,19 @@ void create_dataset(char *filename, cv::Mat &data,cv::Mat &test_image,char *matl
 		}
     }
 }
- 
+
+/******************************************************************************/
+void Mean_variance(int *arr,cv::Mat matrix){
+	 arr[0] = (int)cv::sum(cv::sum(matrix))[0]/49;
+	 int var = 0;
+	 
+	 for(int j = 0;j < matrix.rows;j++){
+		 for(int i = 0;i < matrix.cols;i++){
+			 var = var + ((int)matrix.at<uchar>(j,i)-arr[0])*((int)matrix.at<uchar>(j,i)-arr[0]);
+		}
+	}
+	 arr[1] = var/49;
+ }
 /******************************************************************************/
  
 int main( int argc, char** argv )
@@ -141,7 +153,13 @@ int main( int argc, char** argv )
 	
 	//create a black image to mark detected trees
 	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
+	cv::Mat dot_image1(test_image.rows,test_image.cols,CV_32F);
+	cv::Mat dot_image2(test_image.rows,test_image.cols,CV_32F);
+	cv::Mat dot_image3(test_image.rows,test_image.cols,CV_32F);
 	dot_image = Scalar(0);
+	dot_image1 = Scalar(0);
+	dot_image2 = Scalar(0);
+	dot_image3 = Scalar(0);
 
 	//
 	cv::Mat gray_dot_img,dot_img;
@@ -159,6 +177,8 @@ int main( int argc, char** argv )
 		}
     }
 	test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
+	cv::Mat gray_test_image(test_image.rows,test_image.cols,CV_32F);
+	cv::cvtColor(test_image,gray_test_image,CV_RGB2GRAY);
 		// define the structure for the neural network (MLP)
 		// The neural network has 3 layers.
 		// - one input node per attribute in a sample so 256 input nodes
@@ -238,24 +258,32 @@ int main( int argc, char** argv )
 			col = tsample%(test_image.cols+1-BOX_SIZE);
 
 		if(maxIndex == 1){
-			count++;
-			cout << tsample << "  "<< row +1<<"  "<< col +1<<"  "<< test_image.cols+1-BOX_SIZE << " \n";
+			int mean_var[2];
+			Rect margin(col,row,BOX_SIZE,BOX_SIZE);
+			Mean_variance(mean_var,gray_test_image(margin));
+			cout<<mean_var[1]<<"\t";
 
-			//Mark detected trees in white dots on the black image
-			dot_image.at<float>(Point(col,row)) = 255;
+			if(mean_var[0]>75&&mean_var[0]<110){
+				count++;
+				//cout << tsample << "  "<< row +1<<"  "<< col +1<<"  "<< test_image.cols+1-BOX_SIZE << " \n";
 
-			//Mark a dot on the tree
-			test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[0] = 15;
-			test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[1] = 185;
-			test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[2] = 255;
+				//Mark detected trees in white dots on the black image
+				dot_image.at<float>(Point(col,row)) = 255;
 
-			//draw a GREEN box around the detected trees
-			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++){
-				//if(j/7==0||j%7==6||j%7==0||j/7==6){
-					test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[0] = 0;
-					test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[1] = 255;
-					test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;
-				//}
+				//Mark a dot on the tree
+				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[0] = 15;
+				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[1] = 185;
+				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[2] = 255;
+			
+				//draw a GREEN box around the detected trees
+				for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++){
+					//if(j/7==0||j%7==6||j%7==0||j/7==6){
+						/*test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[0] = 0;
+						test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[1] = 255;
+						test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;*/
+					//}
+				}
+
 			}
 			//printf("Found at row %d  %d %d\n", tsample,row,col);
 
@@ -292,14 +320,187 @@ int main( int argc, char** argv )
             classification_matrix[maxIndex][maxIndex]++;
         }
     }
-	cout << "COUNT = " << ts<<"\n";
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	int new_count = 0;
+	for(int j = 0;j < dot_image.rows;j++)
+	{
+		for(int i = 0;i < dot_image.cols;i++)
+		{
+			if(dot_image.at<float>(Point(i,j)) == 255){
+				int size = 1;
+				int near_by_trees = 0;
+				int x_min,y_min,x_max,y_max;
+				bool tree_found = false;
+				for (; size < 10; size++){
+					if(i - size<0) x_min = 0;
+					else x_min = i - size;
+
+					if(i + size>dot_image.cols-1) x_max = dot_image.cols-1;
+					else x_max = i + size;
+
+					if(j - size<0) y_min = 0;
+					else y_min = j - size;
+
+					if(j + size>dot_image.rows-1) y_max = dot_image.rows-1;
+					else y_max = j + size;
+
+					for(int j1 = y_min;j1 <= y_max;j1++){
+						for(int i1 = x_min;i1 <= x_max;i1++){
+							if((dot_image.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
+								near_by_trees++;
+								if (near_by_trees==1){
+									if (size < 4){
+										dot_image.at<float>(Point(i1,j1)) = 0;
+									}
+									tree_found = true;
+									break;
+								}
+									
+							}
+						}
+						if (tree_found)break;
+					}
+					if (tree_found)break;
+				}
+				if (size < 10){
+					dot_image1.at<float>(Point(i,j)) = 255;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = 0;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = 0;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = 255;
+					new_count++;
+				}
+
+			}
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	new_count = 0;
+	for(int j = 0;j < dot_image1.rows;j++)
+	{
+		for(int i = 0;i < dot_image1.cols;i++)
+		{
+			if(dot_image1.at<float>(Point(i,j)) == 255){
+				int size = 1;
+				int near_by_trees = 0;
+				int x_min,y_min,x_max,y_max;
+				bool tree_found = false;
+				for (; size < 12; size++){
+					if(i - size<0) x_min = 0;
+					else x_min = i - size;
+
+					if(i + size>dot_image1.cols-1) x_max = dot_image1.cols-1;
+					else x_max = i + size;
+
+					if(j - size<0) y_min = 0;
+					else y_min = j - size;
+
+					if(j + size>dot_image1.rows-1) y_max = dot_image1.rows-1;
+					else y_max = j + size;
+					near_by_trees = 0;
+					for(int j1 = y_min;j1 <= y_max;j1++){
+						for(int i1 = x_min;i1 <= x_max;i1++){
+							if((dot_image1.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
+								near_by_trees++;
+								if (near_by_trees==2){
+									tree_found = true;
+									break;
+								}
+									
+							}
+						}
+						if (tree_found)break;
+					}
+					if (tree_found)break;
+				}
+				if (size < 12){
+					dot_image2.at<float>(Point(i,j)) = 255;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = 0;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = 255;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = 0;
+					new_count++;
+				}
+
+			}
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	new_count = 0;
+	for(int j = 0;j < dot_image2.rows;j++)
+	{
+		for(int i = 0;i < dot_image2.cols;i++)
+		{
+			if(dot_image2.at<float>(Point(i,j)) == 255){
+				int size = 1;
+				int near_by_trees = 0;
+				int x_min,y_min,x_max,y_max;
+				bool tree_found = false;
+				for (; size < 17; size++){
+					if(i - size<0) x_min = 0;
+					else x_min = i - size;
+
+					if(i + size>dot_image2.cols-1) x_max = dot_image2.cols-1;
+					else x_max = i + size;
+
+					if(j - size<0) y_min = 0;
+					else y_min = j - size;
+
+					if(j + size>dot_image2.rows-1) y_max = dot_image2.rows-1;
+					else y_max = j + size;
+					near_by_trees = 0;
+					for(int j1 = y_min;j1 <= y_max;j1++){
+						for(int i1 = x_min;i1 <= x_max;i1++){
+							if((dot_image2.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
+								near_by_trees++;
+								if(j>212)
+									cout<<"\n"<< dot_image2.at<float>(Point(i1,j1))<<"  "<<i<<","<<j<<"\n";
+								if (near_by_trees==1){
+									tree_found = true;
+									break;
+								}
+									
+							}
+						}
+						if (tree_found)break;
+					}
+					if (tree_found)break;
+				}
+				if (size < 17){
+					dot_image3.at<float>(Point(i,j)) = 255;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = 255;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = 255;
+					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = 0;
+					new_count++;
+				}
+
+			}
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	cout << "\n\nCOUNT = " << ts<<"\n";
 	cout << "COUNT = " << count;
+	cout << "\nNEW COUNT = " << new_count;
 	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result4.png",test_image);
 	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result5.png",dot_image);
+	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result6.png",dot_image1);
+	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result7.png",dot_image2);
+	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result8.png",dot_image3);
 	namedWindow("Trees",WINDOW_NORMAL);
 	imshow("Trees",test_image);waitKey(1);
 	namedWindow("Trees as Dots",WINDOW_NORMAL);
-	imshow("Trees as Dots",dot_image);waitKey(0);
+	imshow("Trees as Dots",dot_image);waitKey(1);
+	namedWindow("Trees as Dots 1",WINDOW_NORMAL);
+	imshow("Trees as Dots 1",dot_image1);waitKey(1);
+	namedWindow("Trees as Dots 2",WINDOW_NORMAL);
+	imshow("Trees as Dots 2",dot_image2);waitKey(1);
+	namedWindow("Trees as Dots 3",WINDOW_NORMAL);
+	imshow("Trees as Dots 3",dot_image3);waitKey(0);
 
 	cout << "\n\n";
     printf( "\nResults on the testing dataset\n"
