@@ -6,8 +6,20 @@
 class ImageProcessor
 {
 public:
+	static int type_A_no;
+	static int type_B_no;
+
+	cv::Mat input;
+	cv::Mat output;
+
+	std::string inputFile;
+
 	ImageProcessor();
-	ImageProcessor::ImageProcessor(std::string sInputFileName, std::string sOutputFileName, std::string sOutputFileNameTxt, int iStartHour, int iStartMinute, int iStartSecond, int iNoLanes);
+	ImageProcessor(std::string sInputFileName);
+
+	void Process();
+	void showOutput();
+
 	
 };
 

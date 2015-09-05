@@ -8,6 +8,6 @@ void wmain()
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
 
-	VehicleCounter::Main form;
+	SatelliteImageAnalyzer::Main form;
 	Application::Run(%form);
 }

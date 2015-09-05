@@ -10,6 +10,6 @@ void Main(array<String^>^ args)
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
 
-	VehicleCounter::Main form;
+	SatelliteImageAnalyzer::Main form;
 	Application::Run(%form);
 }
