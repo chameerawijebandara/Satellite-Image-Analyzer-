@@ -12,6 +12,7 @@
 #include "opencv2/ml/ml.hpp"          // opencv machine learning include file
 #include <stdio.h>
 #include <fstream>
+#include <string>
 
 using namespace std;
 using namespace cv;
@@ -23,7 +24,9 @@ using namespace cv;
 #define CLASSES 2                  //Number of distinct labels.
 #define BOX_SIZE 7 
 int tree_images = 120;
-int x = 0;		//for test
+std::string folder_name = "C:\\Users\\Dell\\Desktop\\Tree_project\\image1\\";
+std::string image_name = "image1.jpg";
+std::string Mat_output = "Matlab_image.jpg";
 /********************************************************************************
 This function will read the csv files(training and test dataset) and convert them
 into two matrices. classes matrix have 10 columns, one column for each class label. If the label of nth row in data matrix
@@ -69,7 +72,7 @@ void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_sa
 
 /******************************************************************************/
 
-void create_dataset(char *filename, cv::Mat &data,cv::Mat &test_image,char *matlab_image_name)
+void create_dataset(string filename, cv::Mat &data,cv::Mat &test_image,string matlab_image_name)
 {
     float pixelvalue;
 	cv::Mat scan_img,img;
@@ -129,7 +132,65 @@ void Mean_variance(int *arr,cv::Mat matrix){
 	 arr[1] = var/49;
  }
 /******************************************************************************/
- 
+
+
+/******************************************************************************/
+void Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_image_out,cv::Mat rgb_image,int marging_size,int min_trees,Scalar colour){
+	 for(int j = 0;j < dot_image.rows;j++)
+	{
+		for(int i = 0;i < dot_image.cols;i++)
+		{
+			if(dot_image.at<float>(Point(i,j)) == 255){
+				int size = 1;
+				int near_by_trees = 0;
+				int x_min,y_min,x_max,y_max;
+				bool tree_found = false;
+				for (; size < marging_size; size++){
+					if(i - size<0) x_min = 0;
+					else x_min = i - size;
+
+					if(i + size>dot_image.cols-1) x_max = dot_image.cols-1;
+					else x_max = i + size;
+
+					if(j - size<0) y_min = 0;
+					else y_min = j - size;
+
+					if(j + size>dot_image.rows-1) y_max = dot_image.rows-1;
+					else y_max = j + size;
+					near_by_trees = 0;
+					for(int j1 = y_min;j1 <= y_max;j1++){
+						for(int i1 = x_min;i1 <= x_max;i1++){
+							if((dot_image.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
+								near_by_trees++;
+								if (near_by_trees==min_trees){
+									if (size < 4){
+										dot_image.at<float>(Point(i1,j1)) = 0;
+									}
+									tree_found = true;
+									break;
+								}
+									
+							}
+						}
+						if (tree_found)break;
+					}
+					if (tree_found)break;
+				}
+				if (size < marging_size){
+					dot_image_out.at<float>(Point(i,j)) = 255;
+					rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = colour[0];
+					rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = colour[1];
+					rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = colour[2];
+					count[0]++;
+				}
+
+			}
+		}
+	}
+ }
+/******************************************************************************/
+
+
 int main( int argc, char** argv )
 {
 	//matrix to hold the training sample
@@ -149,7 +210,7 @@ int main( int argc, char** argv )
 	tree_images = 90;
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
 	cv::Mat test_image;
-	create_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg", test_set,test_image,"C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
+	create_dataset(folder_name+image_name, test_set,test_image,folder_name+Mat_output);
 	
 	//create a black image to mark detected trees
 	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
@@ -163,7 +224,7 @@ int main( int argc, char** argv )
 
 	//
 	cv::Mat gray_dot_img,dot_img;
-	dot_img = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\Matlab_image.jpg");
+	dot_img = imread(folder_name+Mat_output);
 	cv::cvtColor(dot_img,gray_dot_img,CV_RGB2GRAY);
 	for(int row = 0; row < test_image.rows; row++)
 	{	
@@ -176,7 +237,7 @@ int main( int argc, char** argv )
 			}
 		}
     }
-	test_image = imread("C:\\Users\\Dell\\Desktop\\Tree_project\\image1.jpg");
+	test_image = imread(folder_name+image_name);
 	cv::Mat gray_test_image(test_image.rows,test_image.cols,CV_32F);
 	cv::cvtColor(test_image,gray_test_image,CV_RGB2GRAY);
 		// define the structure for the neural network (MLP)
@@ -261,7 +322,7 @@ int main( int argc, char** argv )
 			int mean_var[2];
 			Rect margin(col,row,BOX_SIZE,BOX_SIZE);
 			Mean_variance(mean_var,gray_test_image(margin));
-			cout<<mean_var[1]<<"\t";
+			//cout<<mean_var[0]<<"\t";
 
 			if(mean_var[0]>75&&mean_var[0]<110){
 				count++;
@@ -283,227 +344,44 @@ int main( int argc, char** argv )
 						test_image.at<Vec3b>(row+j/BOX_SIZE,col+j%BOX_SIZE)[2] = 0;*/
 					//}
 				}
-
 			}
-			//printf("Found at row %d  %d %d\n", tsample,row,col);
-
 		}
-
 		else{
 				dot_image.at<float>(Point(col,row)) = 0;
-		}
-        //printf("Testing Sample %i -> class result (digit %d  %f  %f)\n", tsample,maxIndex, classificationResult.at<float>(0,0),classificationResult.at<float>(0,1));
- 
-        //Now compare the predicted class to the actural class. if the prediction is correct then\
-        //test_set_classifications[tsample][ maxIndex] should be 1.
-        //if the classification is wrong, note that.
-        if (test_set_classifications.at<float>(tsample%TEST_SAMPLES, maxIndex)!=1.0f)
-        {
-            // if they differ more than floating point error => wrong class
- 
-            wrong_class++;
- 
-            //find the actual label 'class_index'
-            for(int class_index=0;class_index<CLASSES;class_index++)
-            {
-                if(test_set_classifications.at<float>(tsample%TEST_SAMPLES, class_index)==1.0f)
-                {
-                    classification_matrix[class_index][maxIndex]++;// A class_index sample was wrongly classified as maxindex.
-                    break;
-                }
-            }
- 
-        } else {
- 
-            // otherwise correct
-            correct_class++;
-            classification_matrix[maxIndex][maxIndex]++;
-        }
+		}        
     }
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	int new_count = 0;
-	for(int j = 0;j < dot_image.rows;j++)
-	{
-		for(int i = 0;i < dot_image.cols;i++)
-		{
-			if(dot_image.at<float>(Point(i,j)) == 255){
-				int size = 1;
-				int near_by_trees = 0;
-				int x_min,y_min,x_max,y_max;
-				bool tree_found = false;
-				for (; size < 10; size++){
-					if(i - size<0) x_min = 0;
-					else x_min = i - size;
-
-					if(i + size>dot_image.cols-1) x_max = dot_image.cols-1;
-					else x_max = i + size;
-
-					if(j - size<0) y_min = 0;
-					else y_min = j - size;
-
-					if(j + size>dot_image.rows-1) y_max = dot_image.rows-1;
-					else y_max = j + size;
-
-					for(int j1 = y_min;j1 <= y_max;j1++){
-						for(int i1 = x_min;i1 <= x_max;i1++){
-							if((dot_image.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
-								near_by_trees++;
-								if (near_by_trees==1){
-									if (size < 4){
-										dot_image.at<float>(Point(i1,j1)) = 0;
-									}
-									tree_found = true;
-									break;
-								}
-									
-							}
-						}
-						if (tree_found)break;
-					}
-					if (tree_found)break;
-				}
-				if (size < 10){
-					dot_image1.at<float>(Point(i,j)) = 255;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = 0;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = 0;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = 255;
-					new_count++;
-				}
-
-			}
-		}
-	}
-
+	Scalar colour;
+	colour = Scalar(0,0,255);
+	Find_nearby_trees(&new_count,dot_image,dot_image1,test_image,10,1,colour);
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	new_count = 0;
-	for(int j = 0;j < dot_image1.rows;j++)
-	{
-		for(int i = 0;i < dot_image1.cols;i++)
-		{
-			if(dot_image1.at<float>(Point(i,j)) == 255){
-				int size = 1;
-				int near_by_trees = 0;
-				int x_min,y_min,x_max,y_max;
-				bool tree_found = false;
-				for (; size < 12; size++){
-					if(i - size<0) x_min = 0;
-					else x_min = i - size;
-
-					if(i + size>dot_image1.cols-1) x_max = dot_image1.cols-1;
-					else x_max = i + size;
-
-					if(j - size<0) y_min = 0;
-					else y_min = j - size;
-
-					if(j + size>dot_image1.rows-1) y_max = dot_image1.rows-1;
-					else y_max = j + size;
-					near_by_trees = 0;
-					for(int j1 = y_min;j1 <= y_max;j1++){
-						for(int i1 = x_min;i1 <= x_max;i1++){
-							if((dot_image1.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
-								near_by_trees++;
-								if (near_by_trees==2){
-									tree_found = true;
-									break;
-								}
-									
-							}
-						}
-						if (tree_found)break;
-					}
-					if (tree_found)break;
-				}
-				if (size < 12){
-					dot_image2.at<float>(Point(i,j)) = 255;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = 0;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = 255;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = 0;
-					new_count++;
-				}
-
-			}
-		}
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	colour = Scalar(0,255,0);
+	Find_nearby_trees(&new_count,dot_image1,dot_image2,test_image,12,2,colour);
+	///////////////////////////////////////////////////////////////////////////////////////////////
 	new_count = 0;
-	for(int j = 0;j < dot_image2.rows;j++)
-	{
-		for(int i = 0;i < dot_image2.cols;i++)
-		{
-			if(dot_image2.at<float>(Point(i,j)) == 255){
-				int size = 1;
-				int near_by_trees = 0;
-				int x_min,y_min,x_max,y_max;
-				bool tree_found = false;
-				for (; size < 17; size++){
-					if(i - size<0) x_min = 0;
-					else x_min = i - size;
-
-					if(i + size>dot_image2.cols-1) x_max = dot_image2.cols-1;
-					else x_max = i + size;
-
-					if(j - size<0) y_min = 0;
-					else y_min = j - size;
-
-					if(j + size>dot_image2.rows-1) y_max = dot_image2.rows-1;
-					else y_max = j + size;
-					near_by_trees = 0;
-					for(int j1 = y_min;j1 <= y_max;j1++){
-						for(int i1 = x_min;i1 <= x_max;i1++){
-							if((dot_image2.at<float>(Point(i1,j1)) == 255)&&(i1 != i || j1 != j)){
-								near_by_trees++;
-								if(j>212)
-									cout<<"\n"<< dot_image2.at<float>(Point(i1,j1))<<"  "<<i<<","<<j<<"\n";
-								if (near_by_trees==1){
-									tree_found = true;
-									break;
-								}
-									
-							}
-						}
-						if (tree_found)break;
-					}
-					if (tree_found)break;
-				}
-				if (size < 17){
-					dot_image3.at<float>(Point(i,j)) = 255;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = 255;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = 255;
-					test_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = 0;
-					new_count++;
-				}
-
-			}
-		}
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	colour = Scalar(255,255,0);
+	Find_nearby_trees(&new_count,dot_image2,dot_image3,test_image,17,1,colour);
+	///////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	cout << "\n\nCOUNT = " << ts<<"\n";
 	cout << "COUNT = " << count;
 	cout << "\nNEW COUNT = " << new_count;
-	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result4.png",test_image);
-	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result5.png",dot_image);
-	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result6.png",dot_image1);
-	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result7.png",dot_image2);
-	imwrite("C:\\Users\\Dell\\Desktop\\Tree_project\\Results_Opencv\\Result8.png",dot_image3);
+	imwrite(folder_name+"Result1.png",test_image);
+	imwrite(folder_name+"Result2.png",dot_image);
+	imwrite(folder_name+"Result3.png",dot_image1);
+	imwrite(folder_name+"Result4.png",dot_image2);
+	imwrite(folder_name+"Result5.png",dot_image3);
 	namedWindow("Trees",WINDOW_NORMAL);
 	imshow("Trees",test_image);waitKey(1);
-	namedWindow("Trees as Dots",WINDOW_NORMAL);
-	imshow("Trees as Dots",dot_image);waitKey(1);
-	namedWindow("Trees as Dots 1",WINDOW_NORMAL);
-	imshow("Trees as Dots 1",dot_image1);waitKey(1);
-	namedWindow("Trees as Dots 2",WINDOW_NORMAL);
-	imshow("Trees as Dots 2",dot_image2);waitKey(1);
 	namedWindow("Trees as Dots 3",WINDOW_NORMAL);
 	imshow("Trees as Dots 3",dot_image3);waitKey(0);
 
 	cout << "\n\n";
-    printf( "\nResults on the testing dataset\n"
+    /*printf( "\nResults on the testing dataset\n"
     "\tCorrect classification: %d (%g%%)\n"
     "\tWrong classifications: %d (%g%%)\n", 
     correct_class, (double) correct_class*100/TEST_SAMPLES,
@@ -522,22 +400,8 @@ int main( int argc, char** argv )
             cout<<classification_matrix[row][col]<<"\t";
         }
         cout<<"\n";
-    }
+    }*/
 	
-	//for test
-	float pixelvalue;
-	for(int row = 0; row < test_set.rows; row++)
-	{	
-		for(int col = 0; col < test_set.cols; col++)
-		{
-			pixelvalue = (float)test_set.at<float>(row,col);
-			if(pixelvalue<0)
-				x = 5;
-		}
-	}
-	cout << "x = "<< x << "\n\n";
-
-
 	int a;
 	cin >> a;
     return 0;

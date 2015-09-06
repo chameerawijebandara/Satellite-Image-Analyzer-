@@ -1,7 +1,7 @@
 clear all;
 close all;
 %open & show image
-I=imread('C:\Users\Dell\Desktop\Tree_project\image3\image3.jpg');
+I=imread('C:\Users\Dell\Desktop\Tree_project\image1\image1.jpg');
 figure,imshow(I);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -37,8 +37,8 @@ for i=1: r
 end
 figure,imshow(J);viscircles(centers,radii);
 
-imwrite(uint8(temp),'C:\Users\Dell\Desktop\Tree_project\image3\Matlab_image.jpg');
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+imwrite(uint8(temp),'C:\Users\Dell\Desktop\Tree_project\image1\Matlab_image.jpg');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %show result
