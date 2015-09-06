@@ -11,7 +11,7 @@ figure,imshow(Binary);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %create a filter          
-filter =  fspecial('gaussian',5,1.2);
+filter =  fspecial('gaussian',5,1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %apply the filter & invert the binary image

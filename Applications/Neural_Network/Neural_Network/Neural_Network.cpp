@@ -187,7 +187,7 @@ void Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_image_out,cv::Ma
 			}
 		}
 	}
- }
+ }	
 /******************************************************************************/
 
 
