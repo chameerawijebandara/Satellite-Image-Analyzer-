@@ -16,8 +16,8 @@ class ImageProcessor
 private :
 		int tree_images; 
 		std::string folder_name;
-		std::string image_name;
 		std::string Mat_output;
+		std::string image_path;
 
 public:
 	static int type_A_no;

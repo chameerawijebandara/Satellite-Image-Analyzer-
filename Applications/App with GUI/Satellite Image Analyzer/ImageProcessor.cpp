@@ -2,13 +2,12 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/opencv.hpp"    // opencv general include file
+#include "opencv2/opencv.hpp"		  // opencv general include file
 #include "opencv2/ml/ml.hpp"          // opencv machine learning include file
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
-#include <cstring>
 #include <vector>
 #include <math.h>
 
@@ -24,19 +23,20 @@ ImageProcessor::ImageProcessor()
 ImageProcessor::ImageProcessor(string sInputFileName): inputFile(sInputFileName)
 {
 	std::vector<std::string> elems;
-	
+	image_path = inputFile;
 	tree_images = 120;
-	folder_name = "C:\\Users\\Dell\\Desktop\\Tree_project\\image3\\";
-	image_name = "image3.jpg";
+	folder_name = "C:\\Users\\Dell\\Desktop\\Tree_project\\image2\\";
 	Mat_output = "Matlab_image.jpg";
 
 }
 
+
+
 void ImageProcessor::showOutput()
 {
-	namedWindow( "Display window", WINDOW_NORMAL );// Create a window for display.
+	namedWindow( "Display window", WINDOW_NORMAL );		  // Create a window for display.
 	imshow( "Display window", output );                   // Show our image inside it.
-    waitKey(0);                                          // Wait for a keystroke in the window
+    waitKey(0);											  // Wait for a keystroke in the window
 }
 
 void ImageProcessor::read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_samples)
@@ -77,7 +77,6 @@ void ImageProcessor::read_dataset(char *filename, cv::Mat &data, cv::Mat &classe
  
 }
 
-/******************************************************************************/
 
 void ImageProcessor::create_dataset(string filename, cv::Mat &data,cv::Mat &test_image,string matlab_image_name)
 {
@@ -99,11 +98,11 @@ void ImageProcessor::create_dataset(string filename, cv::Mat &data,cv::Mat &test
 	{	
 		for(int col = 0; col < scan_img.cols+1-BOX_SIZE; col++)
 		{
-			if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
+			/*if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[0] = 0;
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[1] = 0;
 				test_image.at<Vec3b>(Point(col+BOX_SIZE/2,row+BOX_SIZE/2))[2] = 255;				
-			}
+			}*/
 			for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++)
 			{	
 				if((float)gray_dot_img.at<uchar>(row+BOX_SIZE/2,col+BOX_SIZE/2)>200.0f){
@@ -222,17 +221,33 @@ void ImageProcessor::Process ()
 	cv::Mat test_set(TEST_SAMPLES,ATTRIBUTES,CV_32F);
 	//matrix to hold the test labels.
 	cv::Mat test_set_classifications(TEST_SAMPLES,CLASSES,CV_32F);
- 
-	//
 	cv::Mat classificationResult(1, CLASSES, CV_32F);
 	//load the training and test data sets.
 	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
-	tree_images = 90;
-	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
+	//tree_images = 90;
+	//read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
 	cv::Mat test_image;
-	create_dataset(folder_name+image_name, test_set,test_image,folder_name+Mat_output);
-	
-	//create a black image to mark detected trees
+	create_dataset(image_path, test_set,test_image,folder_name+Mat_output);
+
+	//Colour all the tree areas in green
+	cv::Mat temp = imread(image_path);
+	cvtColor(temp,temp,CV_RGB2GRAY);
+	blur(temp, temp, Size(3, 3));
+	erode(temp, temp, Mat());
+	threshold(temp, temp, 100, 255, CV_THRESH_BINARY);
+	imshow("test",temp);
+	waitKey(0);
+	for(int row = 0; row < temp.rows+1-BOX_SIZE; row++){	
+		for(int col = 0; col < temp.cols+1-BOX_SIZE; col++){
+			if((float)temp.at<uchar>(row,col)<175){
+				test_image.at<Vec3b>(Point(col,row))[0] = 0;
+				test_image.at<Vec3b>(Point(col,row))[2] = 0;
+			}
+		}
+	}
+	/////////////////////////////////////////////////////////////////////
+
+	//create a black images to mark detected trees
 	cv::Mat dot_image(test_image.rows,test_image.cols,CV_32F);
 	cv::Mat dot_image1(test_image.rows,test_image.cols,CV_32F);
 	cv::Mat dot_image2(test_image.rows,test_image.cols,CV_32F);
@@ -242,10 +257,11 @@ void ImageProcessor::Process ()
 	dot_image2 = Scalar(0);
 	dot_image3 = Scalar(0);
 
-	//
-	cv::Mat gray_dot_img,dot_img;
-	dot_img = imread(folder_name+Mat_output);
-	cv::cvtColor(dot_img,gray_dot_img,CV_RGB2GRAY);
+	
+	//Mark a dot on the points detected by matlab
+	cv::Mat gray_dot_img,Matlab_dot_img;
+	Matlab_dot_img = imread(folder_name+Mat_output);
+	cv::cvtColor(Matlab_dot_img,gray_dot_img,CV_RGB2GRAY);
 	for(int row = 0; row < test_image.rows; row++)
 	{	
 		for(int col = 0; col < test_image.cols; col++)
@@ -257,9 +273,13 @@ void ImageProcessor::Process ()
 			}
 		}
     }
-	cv::Mat test_image1 = imread(folder_name+image_name);
+	///////////////////////////////////////////////////////////////////////
+
+	cv::Mat test_image1 = imread(image_path);
 	cv::Mat gray_test_image(test_image.rows,test_image.cols,CV_32F);
 	cv::cvtColor(test_image1,gray_test_image,CV_RGB2GRAY);
+
+
 		// define the structure for the neural network (MLP)
 		// The neural network has 3 layers.
 		// - one input node per attribute in a sample so 256 input nodes
@@ -301,13 +321,14 @@ void ImageProcessor::Process ()
  
     // Test the generated model with the test samples.
     cv::Mat test_sample;
-    //count of correct classifications
-    int correct_class = 0;
-    //count of wrong classifications
-    int wrong_class = 0;
+    ////count of correct classifications
+    //int correct_class = 0;
+    ////count of wrong classifications
+    //int wrong_class = 0;
  
-    //classification matrix gives the count of classes to which the samples were classified.
-    int classification_matrix[CLASSES][CLASSES]={{}};
+    ////classification matrix gives the count of classes to which the samples were classified.
+    //int classification_matrix[CLASSES][CLASSES]={{}};
+
 	int count = 0;
     // for each sample in the test set.
 	int ts;
@@ -365,7 +386,7 @@ void ImageProcessor::Process ()
 			}
 		}
 		else{
-				dot_image.at<float>(Point(col,row)) = 0;
+			dot_image.at<float>(Point(col,row)) = 0;
 		}        
     }
 
@@ -389,39 +410,17 @@ void ImageProcessor::Process ()
 	cout << "COUNT = " << count;
 	cout << "\nNEW COUNT = " << new_count;
 
+	//Save result images
 	imwrite(folder_name+"Result1.png",test_image);
 	imwrite(folder_name+"Result2.png",dot_image);
 	imwrite(folder_name+"Result3.png",dot_image1);
 	imwrite(folder_name+"Result4.png",dot_image2);
 	imwrite(folder_name+"Result5.png",dot_image3);
-	//namedWindow("Trees",WINDOW_NORMAL);
-	//imshow("Trees",test_image);waitKey(1);
-	//namedWindow("Trees as Dots 3",WINDOW_NORMAL);
-	//imshow("Trees as Dots 3",dot_image3);waitKey(0);
+	/////////////////////////////////////////////////////
 
+	//Outputs to show in GUI(Tree count and tree image)
 	type_A_no = new_count;
 	output = test_image;
 
-	cout << "\n\n";
-    /*printf( "\nResults on the testing dataset\n"
-    "\tCorrect classification: %d (%g%%)\n"
-    "\tWrong classifications: %d (%g%%)\n", 
-    correct_class, (double) correct_class*100/TEST_SAMPLES,
-    wrong_class, (double) wrong_class*100/TEST_SAMPLES);
-    cout<<"   ";
-    for (int i = 0; i < CLASSES; i++)
-    {
-        cout<< i<<"\t";
-    }
-    cout<<"\n";
-    for(int row=0;row<CLASSES;row++)
-    {
-		cout<<row<<"   ";
-        for(int col=0;col<CLASSES;col++)
-        {
-            cout<<classification_matrix[row][col]<<"\t";
-        }
-        cout<<"\n";
-    }*/
  
 }

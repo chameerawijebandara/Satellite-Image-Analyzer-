@@ -1,17 +1,17 @@
 clear all;
 close all;
 %open & show image
-I=imread('C:\Users\Dell\Desktop\Tree_project\image3\image3.jpg');
+I=imread('C:\Users\Dell\Desktop\Tree_project\image1\image1.jpg');
 figure,imshow(I);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %covert to binary & show
 Binary = im2bw(I,0.45);
-figure,imshow(Binary);
+% figure,imshow(Binary);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %create a filter          
-filter =  fspecial('gaussian',5,1);
+filter =  fspecial('gaussian',5,1.2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %apply the filter & invert the binary image
@@ -23,7 +23,7 @@ J = I;
 temp = zeros(r,c,d);
 [r,c]=size(centers);
 img_count = 0;
-round(centers)
+% round(centers)
 for i=1: r
    J(round(centers(i,2)),round(centers(i,1)),:) = [255,0,0];
    temp(round(centers(i,2)),round(centers(i,1)),:) = [255,255,255];
@@ -37,7 +37,7 @@ for i=1: r
 end
 figure,imshow(J);viscircles(centers,radii);
 
-imwrite(uint8(temp),'C:\Users\Dell\Desktop\Tree_project\image3\Matlab_image.jpg');
+imwrite(uint8(temp),'C:\Users\Dell\Desktop\Tree_project\image1\Matlab_image.jpg');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -49,7 +49,6 @@ figure,imshow(cfiltereed);
 
 %mark the margin of trees in a new matrix
 [r,c,d]=size(cfiltereed);
-disp([r,c,d]);
 margin = zeros(r,c);
 outimage = zeros(r,c);
 s=0;
@@ -87,8 +86,8 @@ for i=2:c
     end
 end
 cfiltereed = outimage;
-figure,imshow(cfiltereed);
-figure,imshow(I);
+% figure,imshow(cfiltereed);
+% figure,imshow(I);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %create a rgb image correspond to previouse image
