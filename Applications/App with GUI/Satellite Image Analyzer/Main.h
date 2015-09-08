@@ -23,9 +23,11 @@ namespace SatelliteImageAnalyzer {
 	/// </summary>
 	public ref class Main : public System::Windows::Forms::Form
 	{
+	bool isproccesed;
 	public:
 		Main(void)
 		{
+			isproccesed = false;
 			InitializeComponent();
 		}
 
@@ -252,15 +254,33 @@ private: System::Void btn_openImage_Click(System::Object^  sender, System::Event
 				 }
 		 }
 private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
-			 msclr::interop::marshal_context context;
-			 imgp = new ImageProcessor(context.marshal_as<std::string>(fileName));
-			 imgp->Process();
+			 if(textBox1->Text==""){
+				 MessageBox::Show("Open an Image","",MessageBoxButtons::OK,
+									MessageBoxIcon::Error);
+			 }
+			 else
+			 {
+				 msclr::interop::marshal_context context;
+				 imgp = new ImageProcessor(context.marshal_as<std::string>(fileName));
+				 imgp->Process();
+				 isproccesed = true;
+			 }
 
 			 textBox2->Text = ""+ImageProcessor::type_A_no;
 			 textBox3->Text = ""+ImageProcessor::type_B_no;
 		 }
 private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
-			 imgp->showOutput();
+			 if(isproccesed){
+				imgp->showOutput();
+			 }
+			 else if(textBox1->Text==""){
+				 MessageBox::Show("Open an Image","",MessageBoxButtons::OK,
+									MessageBoxIcon::Error);
+			 }
+			 else{
+				 MessageBox::Show("Process is not Done","",MessageBoxButtons::OK,
+					 MessageBoxIcon::Exclamation);
+			 }
 		 }
 private: System::Void panel1_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
 		 }

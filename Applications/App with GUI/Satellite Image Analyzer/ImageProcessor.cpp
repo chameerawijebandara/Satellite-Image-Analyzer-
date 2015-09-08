@@ -8,6 +8,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <windows.h>
 #include <vector>
 #include <math.h>
 
@@ -22,10 +23,15 @@ ImageProcessor::ImageProcessor()
 }
 ImageProcessor::ImageProcessor(string sInputFileName): inputFile(sInputFileName)
 {
-	std::vector<std::string> elems;
+	int i;
+	for(i = inputFile.size()-1;i>0;i--){
+		if(inputFile.at(i)=='\\')
+			break;
+	}
+
 	image_path = inputFile;
 	tree_images = 120;
-	folder_name = "C:\\Users\\Dell\\Desktop\\Tree_project\\image2\\";
+	folder_name = inputFile.substr(0,i+1);
 	Mat_output = "Matlab_image.jpg";
 
 }
@@ -212,6 +218,7 @@ void ImageProcessor::Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_
 
 void ImageProcessor::Process ()
 {
+
 	//matrix to hold the training sample
 	cv::Mat training_set(TRAINING_SAMPLES,ATTRIBUTES,CV_32F);
 	//matrix to hold the labels of each taining sample
@@ -310,9 +317,9 @@ void ImageProcessor::Process ()
  
     // train the neural network (using training data)
  
-    printf( "\nUsing training dataset\n");
+   // printf( "\nUsing training dataset\n");
     int iterations = nnetwork.train(training_set, training_set_classifications,cv::Mat(),cv::Mat(),params);
-    printf( "Training iterations: %i\n\n", iterations);
+    //printf( "Training iterations: %i\n\n", iterations);
  
     // Save the model generated into an xml file.
     CvFileStorage* storage = cvOpenFileStorage( "C:\\Users\\Dell\\Desktop\\Tree_project\\param.xml", 0, CV_STORAGE_WRITE );
@@ -406,9 +413,9 @@ void ImageProcessor::Process ()
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	cout << "\n\nCOUNT = " << ts<<"\n";
-	cout << "COUNT = " << count;
-	cout << "\nNEW COUNT = " << new_count;
+	//cout << "\n\nCOUNT = " << ts<<"\n";
+	//cout << "COUNT = " << count;
+	//cout << "\nNEW COUNT = " << new_count;
 
 	//Save result images
 	imwrite(folder_name+"Result1.png",test_image);
