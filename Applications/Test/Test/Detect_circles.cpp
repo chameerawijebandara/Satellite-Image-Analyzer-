@@ -23,7 +23,7 @@ static HMCRINSTANCE _mcr_inst = NULL;
 #endif
 #include <windows.h>
 
-static char path_to_dll[_MAX_PATH];
+static TCHAR path_to_dll[_MAX_PATH];
 
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, void *pv)
 {
@@ -87,7 +87,9 @@ bool MW_CALL_CONV Detect_circlesInitializeWithHandlers(
     return true;
   if (!mclmcrInitialize())
     return false;
-  if (!GetModuleFileName(GetModuleHandle("Detect_circles"), path_to_dll, _MAX_PATH))
+  char *fname = "Detect_circles" ;
+  
+  if (!GetModuleFileName(GetModuleHandle(fname), path_to_dll, _MAX_PATH))
     return false;
     {
         mclCtfStream ctfStream = 
