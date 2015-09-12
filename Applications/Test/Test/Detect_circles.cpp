@@ -87,9 +87,8 @@ bool MW_CALL_CONV Detect_circlesInitializeWithHandlers(
     return true;
   if (!mclmcrInitialize())
     return false;
-  char *fname = "Detect_circles" ;
   
-  if (!GetModuleFileName(GetModuleHandle(fname), path_to_dll, _MAX_PATH))
+  if (!GetModuleFileName(GetModuleHandle(L"Detect_circles"), path_to_dll, _MAX_PATH))
     return false;
     {
         mclCtfStream ctfStream = 

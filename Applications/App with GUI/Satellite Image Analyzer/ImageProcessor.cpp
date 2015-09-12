@@ -325,7 +325,7 @@ void ImageProcessor::Process ()
     CvFileStorage* storage = cvOpenFileStorage( "C:\\Users\\Dell\\Desktop\\Tree_project\\param.xml", 0, CV_STORAGE_WRITE );
     nnetwork.write(storage,"DigitOCR");
     cvReleaseFileStorage(&storage);
- 
+	nnetwork.load("C:\\Users\\Dell\\Desktop\\Tree_project\\param.xml");
     // Test the generated model with the test samples.
     cv::Mat test_sample;
     ////count of correct classifications

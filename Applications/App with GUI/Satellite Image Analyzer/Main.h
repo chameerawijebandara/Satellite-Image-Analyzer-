@@ -61,6 +61,17 @@ namespace SatelliteImageAnalyzer {
 	private: System::ComponentModel::IContainer^  components;
 
 	System::String^ fileName;
+	private: System::Windows::Forms::RadioButton^  radioButton3;
+	private: System::Windows::Forms::RadioButton^  radioButton2;
+	private: System::Windows::Forms::RadioButton^  radioButton1;
+	private: System::Windows::Forms::Label^  label3;
+	private: System::Windows::Forms::TextBox^  textBox6;
+	private: System::Windows::Forms::TextBox^  textBox5;
+	private: System::Windows::Forms::TextBox^  textBox4;
+	private: System::Windows::Forms::Button^  button3;
+	private: System::Windows::Forms::Label^  label4;
+
+
 
 			 ImageProcessor *imgp;
 
@@ -81,6 +92,15 @@ namespace SatelliteImageAnalyzer {
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->panel3 = (gcnew System::Windows::Forms::Panel());
+			this->button3 = (gcnew System::Windows::Forms::Button());
+			this->label4 = (gcnew System::Windows::Forms::Label());
+			this->label3 = (gcnew System::Windows::Forms::Label());
+			this->textBox6 = (gcnew System::Windows::Forms::TextBox());
+			this->textBox5 = (gcnew System::Windows::Forms::TextBox());
+			this->textBox4 = (gcnew System::Windows::Forms::TextBox());
+			this->radioButton3 = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButton2 = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButton1 = (gcnew System::Windows::Forms::RadioButton());
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->button1 = (gcnew System::Windows::Forms::Button());
@@ -110,9 +130,8 @@ namespace SatelliteImageAnalyzer {
 			this->panel1->Controls->Add(this->panel3);
 			this->panel1->Location = System::Drawing::Point(12, 12);
 			this->panel1->Name = L"panel1";
-			this->panel1->Size = System::Drawing::Size(518, 445);
+			this->panel1->Size = System::Drawing::Size(518, 547);
 			this->panel1->TabIndex = 1;
-			this->panel1->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Main::panel1_Paint);
 			// 
 			// panel2
 			// 
@@ -123,7 +142,7 @@ namespace SatelliteImageAnalyzer {
 			this->panel2->Controls->Add(this->textBox2);
 			this->panel2->Controls->Add(this->label2);
 			this->panel2->Controls->Add(this->label1);
-			this->panel2->Location = System::Drawing::Point(3, 297);
+			this->panel2->Location = System::Drawing::Point(0, 403);
 			this->panel2->Name = L"panel2";
 			this->panel2->Size = System::Drawing::Size(503, 140);
 			this->panel2->TabIndex = 3;
@@ -176,14 +195,115 @@ namespace SatelliteImageAnalyzer {
 			// panel3
 			// 
 			this->panel3->BorderStyle = System::Windows::Forms::BorderStyle::Fixed3D;
+			this->panel3->Controls->Add(this->button3);
+			this->panel3->Controls->Add(this->label4);
+			this->panel3->Controls->Add(this->label3);
+			this->panel3->Controls->Add(this->textBox6);
+			this->panel3->Controls->Add(this->textBox5);
+			this->panel3->Controls->Add(this->textBox4);
+			this->panel3->Controls->Add(this->radioButton3);
+			this->panel3->Controls->Add(this->radioButton2);
+			this->panel3->Controls->Add(this->radioButton1);
 			this->panel3->Controls->Add(this->pictureBox1);
 			this->panel3->Controls->Add(this->textBox1);
 			this->panel3->Controls->Add(this->button1);
 			this->panel3->Controls->Add(this->btn_openImage);
 			this->panel3->Location = System::Drawing::Point(3, 3);
 			this->panel3->Name = L"panel3";
-			this->panel3->Size = System::Drawing::Size(503, 288);
+			this->panel3->Size = System::Drawing::Size(503, 394);
 			this->panel3->TabIndex = 5;
+			this->panel3->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Main::panel3_Paint);
+			// 
+			// button3
+			// 
+			this->button3->Enabled = false;
+			this->button3->Location = System::Drawing::Point(371, 323);
+			this->button3->Name = L"button3";
+			this->button3->Size = System::Drawing::Size(108, 23);
+			this->button3->TabIndex = 13;
+			this->button3->Text = L"Image Folder";
+			this->button3->UseVisualStyleBackColor = true;
+			// 
+			// label4
+			// 
+			this->label4->AutoSize = true;
+			this->label4->Enabled = false;
+			this->label4->Location = System::Drawing::Point(352, 355);
+			this->label4->Name = L"label4";
+			this->label4->Size = System::Drawing::Size(66, 13);
+			this->label4->TabIndex = 12;
+			this->label4->Text = L"Tree Images";
+			// 
+			// label3
+			// 
+			this->label3->AutoSize = true;
+			this->label3->Enabled = false;
+			this->label3->Location = System::Drawing::Point(122, 355);
+			this->label3->Name = L"label3";
+			this->label3->Size = System::Drawing::Size(68, 13);
+			this->label3->TabIndex = 11;
+			this->label3->Text = L"Total Images";
+			// 
+			// textBox6
+			// 
+			this->textBox6->Enabled = false;
+			this->textBox6->Location = System::Drawing::Point(249, 352);
+			this->textBox6->Name = L"textBox6";
+			this->textBox6->Size = System::Drawing::Size(78, 20);
+			this->textBox6->TabIndex = 10;
+			// 
+			// textBox5
+			// 
+			this->textBox5->Enabled = false;
+			this->textBox5->Location = System::Drawing::Point(29, 352);
+			this->textBox5->Name = L"textBox5";
+			this->textBox5->Size = System::Drawing::Size(78, 20);
+			this->textBox5->TabIndex = 9;
+			// 
+			// textBox4
+			// 
+			this->textBox4->Enabled = false;
+			this->textBox4->Location = System::Drawing::Point(29, 326);
+			this->textBox4->Name = L"textBox4";
+			this->textBox4->Size = System::Drawing::Size(336, 20);
+			this->textBox4->TabIndex = 8;
+			// 
+			// radioButton3
+			// 
+			this->radioButton3->AutoSize = true;
+			this->radioButton3->Location = System::Drawing::Point(144, 293);
+			this->radioButton3->Name = L"radioButton3";
+			this->radioButton3->Size = System::Drawing::Size(107, 17);
+			this->radioButton3->TabIndex = 7;
+			this->radioButton3->TabStop = true;
+			this->radioButton3->Text = L"Use Previous NN";
+			this->radioButton3->UseVisualStyleBackColor = true;
+			this->radioButton3->CheckedChanged += gcnew System::EventHandler(this, &Main::radioButton3_CheckedChanged);
+			// 
+			// radioButton2
+			// 
+			this->radioButton2->AutoSize = true;
+			this->radioButton2->Location = System::Drawing::Point(272, 293);
+			this->radioButton2->Name = L"radioButton2";
+			this->radioButton2->Size = System::Drawing::Size(93, 17);
+			this->radioButton2->TabIndex = 6;
+			this->radioButton2->TabStop = true;
+			this->radioButton2->Text = L"Train New NN";
+			this->radioButton2->UseVisualStyleBackColor = true;
+			this->radioButton2->CheckedChanged += gcnew System::EventHandler(this, &Main::radioButton2_CheckedChanged);
+			// 
+			// radioButton1
+			// 
+			this->radioButton1->AutoSize = true;
+			this->radioButton1->Checked = true;
+			this->radioButton1->Location = System::Drawing::Point(29, 293);
+			this->radioButton1->Name = L"radioButton1";
+			this->radioButton1->Size = System::Drawing::Size(100, 17);
+			this->radioButton1->TabIndex = 5;
+			this->radioButton1->TabStop = true;
+			this->radioButton1->Text = L"Use Default NN";
+			this->radioButton1->UseVisualStyleBackColor = true;
+			this->radioButton1->CheckedChanged += gcnew System::EventHandler(this, &Main::radioButton1_CheckedChanged);
 			// 
 			// pictureBox1
 			// 
@@ -217,7 +337,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			// Main
 			// 
-			this->ClientSize = System::Drawing::Size(542, 469);
+			this->ClientSize = System::Drawing::Size(542, 571);
 			this->Controls->Add(this->panel1);
 			this->MaximizeBox = false;
 			this->Name = L"Main";
@@ -282,9 +402,34 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 					 MessageBoxIcon::Exclamation);
 			 }
 		 }
-private: System::Void panel1_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
+
+
+private: System::Void panel3_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
 		 }
+private: System::Void radioButton2_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+			 button3->Enabled = true;
+			 textBox4->Enabled = true;
+			 textBox5->Enabled = true;
+			 textBox6->Enabled = true;
+			 label3->Enabled = true;
+			 label4->Enabled = true;
 
-
+		 }
+private: System::Void radioButton3_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+			 button3->Enabled = false;
+			 textBox4->Enabled = false;
+			 textBox5->Enabled = false;
+			 textBox6->Enabled = false;
+			 label3->Enabled = false;
+			 label4->Enabled = false;
+		 }
+private: System::Void radioButton1_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+			 button3->Enabled = false;
+			 textBox4->Enabled = false;
+			 textBox5->Enabled = false;
+			 textBox6->Enabled = false;
+			 label3->Enabled = false;
+			 label4->Enabled = false;
+		 }
 };
 }
