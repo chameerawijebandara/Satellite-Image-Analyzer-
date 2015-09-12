@@ -32,6 +32,7 @@ ImageProcessor::ImageProcessor(string sInputFileName): inputFile(sInputFileName)
 	image_path = inputFile;
 	tree_images = 120;
 	folder_name = inputFile.substr(0,i+1);
+	imwrite("image.jpg",imread(inputFile));
 	Mat_output = "Matlab_image.jpg";
 
 }
@@ -218,7 +219,7 @@ void ImageProcessor::Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_
 
 void ImageProcessor::Process ()
 {
-
+	system("Detect_circles.exe");
 	//matrix to hold the training sample
 	cv::Mat training_set(TRAINING_SAMPLES,ATTRIBUTES,CV_32F);
 	//matrix to hold the labels of each taining sample
@@ -234,7 +235,7 @@ void ImageProcessor::Process ()
 	//tree_images = 90;
 	//read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
 	cv::Mat test_image;
-	create_dataset(image_path, test_set,test_image,folder_name+Mat_output);
+	create_dataset(image_path, test_set,test_image,Mat_output);
 
 	//Colour all the tree areas in green
 	cv::Mat temp = imread(image_path);
@@ -242,8 +243,7 @@ void ImageProcessor::Process ()
 	blur(temp, temp, Size(3, 3));
 	erode(temp, temp, Mat());
 	threshold(temp, temp, 100, 255, CV_THRESH_BINARY);
-	imshow("test",temp);
-	waitKey(0);
+	
 	for(int row = 0; row < temp.rows+1-BOX_SIZE; row++){	
 		for(int col = 0; col < temp.cols+1-BOX_SIZE; col++){
 			if((float)temp.at<uchar>(row,col)<175){

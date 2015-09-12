@@ -73,6 +73,7 @@ namespace SatelliteImageAnalyzer {
 
 
 
+
 			 ImageProcessor *imgp;
 
 
@@ -223,6 +224,7 @@ namespace SatelliteImageAnalyzer {
 			this->button3->TabIndex = 13;
 			this->button3->Text = L"Image Folder";
 			this->button3->UseVisualStyleBackColor = true;
+			this->button3->Click += gcnew System::EventHandler(this, &Main::button3_Click);
 			// 
 			// label4
 			// 
@@ -430,6 +432,9 @@ private: System::Void radioButton1_CheckedChanged(System::Object^  sender, Syste
 			 textBox6->Enabled = false;
 			 label3->Enabled = false;
 			 label4->Enabled = false;
+		 }
+private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
+			
 		 }
 };
 }
