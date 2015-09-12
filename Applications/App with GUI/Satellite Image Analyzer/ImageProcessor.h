@@ -19,6 +19,7 @@ private :
 		std::string Mat_output;
 		std::string image_path;
 
+
 public:
 	static int type_A_no;
 	static int type_B_no;

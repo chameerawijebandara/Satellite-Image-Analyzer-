@@ -220,18 +220,67 @@ void ImageProcessor::Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_
 void ImageProcessor::Process ()
 {
 	system("Detect_circles.exe");
-	//matrix to hold the training sample
-	cv::Mat training_set(TRAINING_SAMPLES,ATTRIBUTES,CV_32F);
-	//matrix to hold the labels of each taining sample
-	cv::Mat training_set_classifications(TRAINING_SAMPLES, CLASSES, CV_32F);
+	int training_option = 1;
+
+	cv::Mat layers(3,1,CV_32S);
+    layers.at<int>(0,0) = ATTRIBUTES;//input layer
+    layers.at<int>(1,0) = 16;//hidden layer
+    layers.at<int>(2,0) = CLASSES;//output layer
+		
+    //create the neural network.
+    CvANN_MLP nnetwork(layers, CvANN_MLP::SIGMOID_SYM,0.6,1);
+
+	if(training_option==0){
+		nnetwork.load("Default_Neural_Network.xml");
+	}
+	else if(training_option==1){
+		nnetwork.load("User_Neural_Network.xml");
+	}
+	else{
+		//matrix to hold the training sample
+		cv::Mat training_set(TRAINING_SAMPLES,ATTRIBUTES,CV_32F);
+		//matrix to hold the labels of each taining sample
+		cv::Mat training_set_classifications(TRAINING_SAMPLES, CLASSES, CV_32F);
+	
+		//load the training and test data sets.
+		read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
+
+			// define the structure for the neural network (MLP)
+			// The neural network has 3 layers.
+			// - one input node per attribute in a sample so 256 input nodes
+			// - 16 hidden nodes
+			// - 10 output node, one for each class.
+ 
+    
+ 
+		CvANN_MLP_TrainParams params(                     
+										// terminate the training after either 1000
+										// iterations or a very small change in the
+										// network wieghts below the specified value
+										cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001),
+										// use backpropogation for training
+										CvANN_MLP_TrainParams::BACKPROP,
+										// co-efficents for backpropogation training
+										// recommended values taken from http://docs.opencv.org/modules/ml/doc/neural_networks.html#cvann-mlp-trainparams
+										0.1,
+										0.1);
+ 
+		// train the neural network (using training data)
+ 
+	   // printf( "\nUsing training dataset\n");
+		int iterations = nnetwork.train(training_set, training_set_classifications,cv::Mat(),cv::Mat(),params);
+		//printf( "Training iterations: %i\n\n", iterations);
+ 
+		// Save the model generated into an xml file.
+		CvFileStorage* storage = cvOpenFileStorage( "User_Neural_Network.xml.xml", 0, CV_STORAGE_WRITE );
+		nnetwork.write(storage,"DigitOCR");
+		cvReleaseFileStorage(&storage);
+	}
 	//matric to hold the test samples
-	//cv::Mat test_set;
 	cv::Mat test_set(TEST_SAMPLES,ATTRIBUTES,CV_32F);
 	//matrix to hold the test labels.
-	cv::Mat test_set_classifications(TEST_SAMPLES,CLASSES,CV_32F);
+	//cv::Mat test_set_classifications(TEST_SAMPLES,CLASSES,CV_32F);
 	cv::Mat classificationResult(1, CLASSES, CV_32F);
-	//load the training and test data sets.
-	read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive", training_set, training_set_classifications, TRAINING_SAMPLES);
 	//tree_images = 90;
 	//read_dataset("C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\MatLab", test_set, test_set_classifications, TEST_SAMPLES);
 	cv::Mat test_image;
@@ -287,45 +336,7 @@ void ImageProcessor::Process ()
 	cv::cvtColor(test_image1,gray_test_image,CV_RGB2GRAY);
 
 
-		// define the structure for the neural network (MLP)
-		// The neural network has 3 layers.
-		// - one input node per attribute in a sample so 256 input nodes
-		// - 16 hidden nodes
-		// - 10 output node, one for each class.
- 
-    cv::Mat layers(3,1,CV_32S);
-    layers.at<int>(0,0) = ATTRIBUTES;//input layer
-    layers.at<int>(1,0) = 16;//hidden layer
-    layers.at<int>(2,0) = CLASSES;//output layer
-		
-		
-
-    //create the neural network.
-    CvANN_MLP nnetwork(layers, CvANN_MLP::SIGMOID_SYM,0.6,1);
- 
-    CvANN_MLP_TrainParams params(                     
-                                    // terminate the training after either 1000
-                                    // iterations or a very small change in the
-                                    // network wieghts below the specified value
-                                    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001),
-                                    // use backpropogation for training
-                                    CvANN_MLP_TrainParams::BACKPROP,
-                                    // co-efficents for backpropogation training
-                                    // recommended values taken from http://docs.opencv.org/modules/ml/doc/neural_networks.html#cvann-mlp-trainparams
-                                    0.1,
-                                    0.1);
- 
-    // train the neural network (using training data)
- 
-   // printf( "\nUsing training dataset\n");
-    int iterations = nnetwork.train(training_set, training_set_classifications,cv::Mat(),cv::Mat(),params);
-    //printf( "Training iterations: %i\n\n", iterations);
- 
-    // Save the model generated into an xml file.
-    CvFileStorage* storage = cvOpenFileStorage( "C:\\Users\\Dell\\Desktop\\Tree_project\\param.xml", 0, CV_STORAGE_WRITE );
-    nnetwork.write(storage,"DigitOCR");
-    cvReleaseFileStorage(&storage);
-	nnetwork.load("C:\\Users\\Dell\\Desktop\\Tree_project\\param.xml");
+	
     // Test the generated model with the test samples.
     cv::Mat test_sample;
     ////count of correct classifications
