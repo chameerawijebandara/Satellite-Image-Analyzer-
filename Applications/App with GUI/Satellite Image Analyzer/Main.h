@@ -63,7 +63,7 @@ namespace SatelliteImageAnalyzer {
 
 	System::String^ fileName;
 	private: System::Windows::Forms::RadioButton^  radioButton3;
-	private: System::Windows::Forms::RadioButton^  radioButton2;
+
 	private: System::Windows::Forms::RadioButton^  radioButton1;
 	private: System::Windows::Forms::Label^  label3;
 
@@ -108,7 +108,6 @@ namespace SatelliteImageAnalyzer {
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->textBox4 = (gcnew System::Windows::Forms::TextBox());
 			this->radioButton3 = (gcnew System::Windows::Forms::RadioButton());
-			this->radioButton2 = (gcnew System::Windows::Forms::RadioButton());
 			this->radioButton1 = (gcnew System::Windows::Forms::RadioButton());
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
@@ -175,7 +174,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			this->textBox3->Location = System::Drawing::Point(209, 69);
 			this->textBox3->Name = L"textBox3";
-			this->textBox3->Size = System::Drawing::Size(69, 26);
+			this->textBox3->Size = System::Drawing::Size(69, 20);
 			this->textBox3->TabIndex = 3;
 			this->textBox3->TextChanged += gcnew System::EventHandler(this, &Main::textBox3_TextChanged);
 			// 
@@ -183,7 +182,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			this->textBox2->Location = System::Drawing::Point(209, 32);
 			this->textBox2->Name = L"textBox2";
-			this->textBox2->Size = System::Drawing::Size(69, 26);
+			this->textBox2->Size = System::Drawing::Size(69, 20);
 			this->textBox2->TabIndex = 2;
 			// 
 			// label2
@@ -191,7 +190,7 @@ namespace SatelliteImageAnalyzer {
 			this->label2->AutoSize = true;
 			this->label2->Location = System::Drawing::Point(26, 69);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(180, 20);
+			this->label2->Size = System::Drawing::Size(123, 13);
 			this->label2->TabIndex = 1;
 			this->label2->Text = L"Number of Type B Trees";
 			// 
@@ -200,7 +199,7 @@ namespace SatelliteImageAnalyzer {
 			this->label1->AutoSize = true;
 			this->label1->Location = System::Drawing::Point(26, 32);
 			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(180, 20);
+			this->label1->Size = System::Drawing::Size(123, 13);
 			this->label1->TabIndex = 0;
 			this->label1->Text = L"Number of Type A Trees";
 			// 
@@ -215,7 +214,6 @@ namespace SatelliteImageAnalyzer {
 			this->panel3->Controls->Add(this->label3);
 			this->panel3->Controls->Add(this->textBox4);
 			this->panel3->Controls->Add(this->radioButton3);
-			this->panel3->Controls->Add(this->radioButton2);
 			this->panel3->Controls->Add(this->radioButton1);
 			this->panel3->Controls->Add(this->pictureBox1);
 			this->panel3->Controls->Add(this->textBox1);
@@ -229,25 +227,22 @@ namespace SatelliteImageAnalyzer {
 			// 
 			// numericUpDown2
 			// 
-			this->numericUpDown2->Enabled = false;
 			this->numericUpDown2->Location = System::Drawing::Point(12, 395);
 			this->numericUpDown2->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) {1000000000, 0, 0, 0});
 			this->numericUpDown2->Name = L"numericUpDown2";
-			this->numericUpDown2->Size = System::Drawing::Size(96, 26);
+			this->numericUpDown2->Size = System::Drawing::Size(96, 20);
 			this->numericUpDown2->TabIndex = 16;
 			// 
 			// numericUpDown1
 			// 
-			this->numericUpDown1->Enabled = false;
 			this->numericUpDown1->Location = System::Drawing::Point(12, 358);
 			this->numericUpDown1->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) {100000000, 0, 0, 0});
 			this->numericUpDown1->Name = L"numericUpDown1";
-			this->numericUpDown1->Size = System::Drawing::Size(96, 26);
+			this->numericUpDown1->Size = System::Drawing::Size(96, 20);
 			this->numericUpDown1->TabIndex = 15;
 			// 
 			// button4
 			// 
-			this->button4->Enabled = false;
 			this->button4->Location = System::Drawing::Point(376, 386);
 			this->button4->Name = L"button4";
 			this->button4->Size = System::Drawing::Size(114, 31);
@@ -258,8 +253,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			// button3
 			// 
-			this->button3->Enabled = false;
-			this->button3->Location = System::Drawing::Point(376, 326);
+			this->button3->Location = System::Drawing::Point(376, 320);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(114, 31);
 			this->button3->TabIndex = 13;
@@ -270,29 +264,26 @@ namespace SatelliteImageAnalyzer {
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Enabled = false;
 			this->label4->Location = System::Drawing::Point(117, 397);
 			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(98, 20);
+			this->label4->Size = System::Drawing::Size(66, 13);
 			this->label4->TabIndex = 12;
 			this->label4->Text = L"Tree Images";
 			// 
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Enabled = false;
 			this->label3->Location = System::Drawing::Point(114, 362);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(101, 20);
+			this->label3->Size = System::Drawing::Size(68, 13);
 			this->label3->TabIndex = 11;
 			this->label3->Text = L"Total Images";
 			// 
 			// textBox4
 			// 
-			this->textBox4->Enabled = false;
 			this->textBox4->Location = System::Drawing::Point(12, 326);
 			this->textBox4->Name = L"textBox4";
-			this->textBox4->Size = System::Drawing::Size(318, 26);
+			this->textBox4->Size = System::Drawing::Size(318, 20);
 			this->textBox4->TabIndex = 8;
 			// 
 			// radioButton3
@@ -300,24 +291,11 @@ namespace SatelliteImageAnalyzer {
 			this->radioButton3->AutoSize = true;
 			this->radioButton3->Location = System::Drawing::Point(174, 293);
 			this->radioButton3->Name = L"radioButton3";
-			this->radioButton3->Size = System::Drawing::Size(153, 24);
+			this->radioButton3->Size = System::Drawing::Size(88, 17);
 			this->radioButton3->TabIndex = 7;
 			this->radioButton3->TabStop = true;
-			this->radioButton3->Text = L"Use Previous NN";
+			this->radioButton3->Text = L"Use New NN";
 			this->radioButton3->UseVisualStyleBackColor = true;
-			this->radioButton3->CheckedChanged += gcnew System::EventHandler(this, &Main::radioButton3_CheckedChanged);
-			// 
-			// radioButton2
-			// 
-			this->radioButton2->AutoSize = true;
-			this->radioButton2->Location = System::Drawing::Point(327, 293);
-			this->radioButton2->Name = L"radioButton2";
-			this->radioButton2->Size = System::Drawing::Size(130, 24);
-			this->radioButton2->TabIndex = 6;
-			this->radioButton2->TabStop = true;
-			this->radioButton2->Text = L"Train New NN";
-			this->radioButton2->UseVisualStyleBackColor = true;
-			this->radioButton2->CheckedChanged += gcnew System::EventHandler(this, &Main::radioButton2_CheckedChanged);
 			// 
 			// radioButton1
 			// 
@@ -325,15 +303,15 @@ namespace SatelliteImageAnalyzer {
 			this->radioButton1->Checked = true;
 			this->radioButton1->Location = System::Drawing::Point(29, 293);
 			this->radioButton1->Name = L"radioButton1";
-			this->radioButton1->Size = System::Drawing::Size(145, 24);
+			this->radioButton1->Size = System::Drawing::Size(100, 17);
 			this->radioButton1->TabIndex = 5;
 			this->radioButton1->TabStop = true;
 			this->radioButton1->Text = L"Use Default NN";
 			this->radioButton1->UseVisualStyleBackColor = true;
-			this->radioButton1->CheckedChanged += gcnew System::EventHandler(this, &Main::radioButton1_CheckedChanged);
 			// 
 			// pictureBox1
 			// 
+			this->pictureBox1->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
 			this->pictureBox1->Location = System::Drawing::Point(12, 67);
 			this->pictureBox1->Name = L"pictureBox1";
 			this->pictureBox1->Size = System::Drawing::Size(318, 209);
@@ -345,7 +323,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			this->textBox1->Location = System::Drawing::Point(12, 36);
 			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(318, 26);
+			this->textBox1->Size = System::Drawing::Size(318, 20);
 			this->textBox1->TabIndex = 1;
 			// 
 			// button1
@@ -413,8 +391,15 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 				 if( imgp )
 					 delete imgp;
 				 imgp = new ImageProcessor(context.marshal_as<std::string>(fileName));
-				 imgp->Process();
-				 isproccesed = true;
+				 if(radioButton1->Checked){
+					imgp->Process(0);
+					isproccesed = true;
+				 }
+				 else if(radioButton3->Checked){
+					imgp->Process(1);
+					isproccesed = true;
+				 }
+				 
 			 }
 
 			 textBox2->Text = ""+ImageProcessor::type_A_no;
@@ -447,24 +432,8 @@ private: System::Void radioButton2_CheckedChanged(System::Object^  sender, Syste
 			 label4->Enabled = true;
 
 		 }
-private: System::Void radioButton3_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-			 button3->Enabled = false;
-			 button4->Enabled = false;
-			 textBox4->Enabled = false;
-			 numericUpDown1->Enabled = false;
-			 numericUpDown2->Enabled = false;
-			 label3->Enabled = false;
-			 label4->Enabled = false;
-		 }
-private: System::Void radioButton1_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-			 button3->Enabled = false;
-			 button4->Enabled = false;
-			 textBox4->Enabled = false;
-			 numericUpDown1->Enabled = false;
-			 numericUpDown2->Enabled = false;
-			 label3->Enabled = false;
-			 label4->Enabled = false;
-		 }
+
+
 private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
 
 
@@ -480,8 +449,21 @@ private: System::Void button3_Click(System::Object^  sender, System::EventArgs^ 
 		 }
 
 private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) {
-
-			 imgp->train(*folderPath, (int)numericUpDown1->Value, (int)numericUpDown2->Value );
+			 if(textBox4->Text==""){
+				 MessageBox::Show("Select the Folder Containig Sample Images to Train Neural Network","",MessageBoxButtons::OK,
+									MessageBoxIcon::Error);
+			 }
+			 else if((int)numericUpDown1->Value==0){
+				 MessageBox::Show("Mention the Number of Images in the Image Folder","",MessageBoxButtons::OK,
+									MessageBoxIcon::Error);
+			 }
+			 else if((int)numericUpDown2->Value==0){
+				 MessageBox::Show("Mention the Number of TREE Images in the Image Folder","",MessageBoxButtons::OK,
+									MessageBoxIcon::Error);
+			 }
+			 else{
+				 imgp->train(*folderPath, (int)numericUpDown1->Value, (int)numericUpDown2->Value );
+			 }
 		 }
 };
 }

@@ -33,7 +33,7 @@ public:
 	ImageProcessor(std::string sInputFileName);
 
 	ImageProcessor();
-	void Process();
+	void Process(int training_option);
 	void showOutput();
 	void train( std::string folderPath, int total_images, int tree_images );
 
@@ -42,7 +42,7 @@ public:
 		void Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_image_out,cv::Mat rgb_image,int marging_size,int min_trees,cv::Scalar colour,bool large_box);
 		void Mean_variance(int *arr,cv::Mat matrix);
 		void create_dataset(std::string filename, cv::Mat &data,cv::Mat &test_image,std::string matlab_image_name);
-		void read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_samples);
+		void read_dataset(std::string filename, cv::Mat &data, cv::Mat &classes,  int total_samples);
 		
 
 	

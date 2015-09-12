@@ -46,36 +46,30 @@ void ImageProcessor::showOutput()
     waitKey(0);											  // Wait for a keystroke in the window
 }
 
-void ImageProcessor::read_dataset(char *filename, cv::Mat &data, cv::Mat &classes,  int total_samples)
+void ImageProcessor::read_dataset(std::string filename, cv::Mat &data, cv::Mat &classes,  int total_samples)
 {
  
-    //int label;
     float pixelvalue;
 	string full_name;
-    //open the file
-    //FILE* inputfile = fopen( filename, "r" );
 	cv::Mat scan_img,img;
 	char img_name [200];
     //read each row of the csv file
    for(int row = 0; row < total_samples; row++)
    {
-		sprintf (img_name, "%s\\%d.jpg",filename, row+1);
+	   sprintf (img_name, "%s\\%d.jpg",filename.c_str(), row+1);
 		img = imread(img_name);
 		cv::cvtColor(img,scan_img,CV_RGB2GRAY);
 		   //for each attribute in the row
-		if(row < tree_images)
-		{
+		if(row < tree_images){
 			classes.at<float>(row,1) = 1.0;
 			classes.at<float>(row,0) = 0;
 		}
-		else
-		{
+		else{
 			classes.at<float>(row,1) = 0;
 			classes.at<float>(row,0) = 1.0;
 		}
 		
-		for(int col = 0; col <ATTRIBUTES; col++)
-		{
+		for(int col = 0; col <ATTRIBUTES; col++){
 			pixelvalue = (float)scan_img.at<uchar>(col/BOX_SIZE,col%BOX_SIZE);
 			data.at<float>(row,col) = pixelvalue;
 			
@@ -203,9 +197,9 @@ void ImageProcessor::Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_
 						}
 					}
 					else{
-						rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = colour[0];
+						/*rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[0] = colour[0];
 						rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[1] = colour[1];
-						rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = colour[2];
+						rgb_image.at<Vec3b>(Point(i+BOX_SIZE/2,j+BOX_SIZE/2))[2] = colour[2];*/
 					}
 					count[0]++;
 				}
@@ -217,16 +211,16 @@ void ImageProcessor::Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_
 /******************************************************************************/
 
 
-void ImageProcessor::Process ()
+void ImageProcessor::Process (int training_option)
 {
+
 	system("Detect_circles.exe");
-	int training_option = 1;
+	
 
 	cv::Mat layers(3,1,CV_32S);
     layers.at<int>(0,0) = ATTRIBUTES;//input layer
     layers.at<int>(1,0) = 16;//hidden layer
     layers.at<int>(2,0) = CLASSES;//output layer
-		
     //create the neural network.
     CvANN_MLP nnetwork(layers, CvANN_MLP::SIGMOID_SYM,0.6,1);
 
@@ -236,7 +230,9 @@ void ImageProcessor::Process ()
 	else if(training_option==1){
 		nnetwork.load("User_Neural_Network.xml");
 	}
-	else{
+	else
+		return;
+	/*else{
 		//matrix to hold the training sample
 		cv::Mat training_set(TRAINING_SAMPLES,ATTRIBUTES,CV_32F);
 		//matrix to hold the labels of each taining sample
@@ -275,7 +271,8 @@ void ImageProcessor::Process ()
 		CvFileStorage* storage = cvOpenFileStorage( "User_Neural_Network.xml.xml", 0, CV_STORAGE_WRITE );
 		nnetwork.write(storage,"DigitOCR");
 		cvReleaseFileStorage(&storage);
-	}
+	}*/
+
 	//matric to hold the test samples
 	cv::Mat test_set(TEST_SAMPLES,ATTRIBUTES,CV_32F);
 	//matrix to hold the test labels.
@@ -444,5 +441,53 @@ void ImageProcessor::Process ()
 }
 void ImageProcessor::train( std::string folderPath, int total_images, int tree_images )
 {
+	this->tree_images = tree_images;
+	cv::Mat layers(3,1,CV_32S);
+    layers.at<int>(0,0) = ATTRIBUTES;//input layer
+    layers.at<int>(1,0) = 16;//hidden layer
+    layers.at<int>(2,0) = CLASSES;//output layer
+	
+    //create the neural network.
+    CvANN_MLP nnetwork(layers, CvANN_MLP::SIGMOID_SYM,0.6,1);
+		
+	//matrix to hold the training sample
+	cv::Mat training_set(total_images,ATTRIBUTES,CV_32F);
+	//matrix to hold the labels of each taining sample
+	cv::Mat training_set_classifications(total_images, CLASSES, CV_32F);
+	//load the training and test data sets. 
+	read_dataset(folderPath, training_set, training_set_classifications, total_images);
+	//folderPath = "C:\\Users\\Dell\\Desktop\\Tree_project\\New folder\\Positive";
+	
+		// define the structure for the neural network (MLP)
+		// The neural network has 3 layers.
+		// - one input node per attribute in a sample so 256 input nodes
+		// - 16 hidden nodes
+		// - 10 output node, one for each class.
+ 
+    
+ 
+	CvANN_MLP_TrainParams params(                     
+									// terminate the training after either 1000
+									// iterations or a very small change in the
+									// network wieghts below the specified value
+									cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001),
+									// use backpropogation for training
+									CvANN_MLP_TrainParams::BACKPROP,
+									// co-efficents for backpropogation training
+									// recommended values taken from http://docs.opencv.org/modules/ml/doc/neural_networks.html#cvann-mlp-trainparams
+									0.1,
+									0.1);
+ 
+	// train the neural network (using training data)
+ 
+	// printf( "\nUsing training dataset\n");
+	int iterations = nnetwork.train(training_set, training_set_classifications,cv::Mat(),cv::Mat(),params);
+	//printf( "Training iterations: %i\n\n", iterations);
+ 
+	// Save the model generated into an xml file.
+	CvFileStorage* storage = cvOpenFileStorage( "User_Neural_Network.xml", 0, CV_STORAGE_WRITE );
+	nnetwork.write(storage,"DigitOCR");
+	cvReleaseFileStorage(&storage);
+	
 
 }
