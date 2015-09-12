@@ -442,3 +442,7 @@ void ImageProcessor::Process ()
 
  
 }
+void ImageProcessor::train( std::string folderPath, int total_images, int tree_images )
+{
+
+}
