@@ -23,16 +23,16 @@ ImageProcessor::ImageProcessor()
 }
 ImageProcessor::ImageProcessor(string sInputFileName): inputFile(sInputFileName)
 {
+	
 	int i;
 	for(i = inputFile.size()-1;i>0;i--){
 		if(inputFile.at(i)=='\\')
 			break;
 	}
-
 	image_path = inputFile;
 	tree_images = 120;
 	folder_name = inputFile.substr(0,i+1);
-	imwrite("image.jpg",imread(inputFile));
+	imwrite("image.png",imread(inputFile));
 	Mat_output = "Matlab_image.jpg";
 
 }
@@ -213,9 +213,7 @@ void ImageProcessor::Find_nearby_trees(int *count,cv::Mat dot_image,cv::Mat dot_
 
 void ImageProcessor::Process (int training_option)
 {
-
 	system("Detect_circles.exe");
-	
 
 	cv::Mat layers(3,1,CV_32S);
     layers.at<int>(0,0) = ATTRIBUTES;//input layer
@@ -313,9 +311,9 @@ void ImageProcessor::Process (int training_option)
 	
 	//Mark a dot on the points detected by matlab
 	cv::Mat gray_dot_img,Matlab_dot_img;
-	Matlab_dot_img = imread(folder_name+Mat_output);
+	Matlab_dot_img = imread(Mat_output);
 	cv::cvtColor(Matlab_dot_img,gray_dot_img,CV_RGB2GRAY);
-	for(int row = 0; row < test_image.rows; row++)
+	/*for(int row = 0; row < test_image.rows; row++)
 	{	
 		for(int col = 0; col < test_image.cols; col++)
 		{
@@ -325,7 +323,7 @@ void ImageProcessor::Process (int training_option)
 				test_image.at<Vec3b>(Point(col,row))[2] = 255;
 			}
 		}
-    }
+    }*/
 	///////////////////////////////////////////////////////////////////////
 
 	cv::Mat test_image1 = imread(image_path);
@@ -386,9 +384,9 @@ void ImageProcessor::Process (int training_option)
 				dot_image.at<float>(Point(col,row)) = 255;
 
 				//Mark a dot on the tree
-				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[0] = 15;
+				/*test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[0] = 15;
 				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[1] = 185;
-				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[2] = 255;
+				test_image.at<Vec3b>(Point(col + BOX_SIZE/2,row + BOX_SIZE/2))[2] = 255;*/
 			
 				//draw a GREEN box around the detected trees
 				for(int j = 0; j <BOX_SIZE*BOX_SIZE; j++){
@@ -427,10 +425,10 @@ void ImageProcessor::Process (int training_option)
 
 	//Save result images
 	imwrite(folder_name+"Result1.png",test_image);
-	imwrite(folder_name+"Result2.png",dot_image);
+	/*imwrite(folder_name+"Result2.png",dot_image);
 	imwrite(folder_name+"Result3.png",dot_image1);
 	imwrite(folder_name+"Result4.png",dot_image2);
-	imwrite(folder_name+"Result5.png",dot_image3);
+	imwrite(folder_name+"Result5.png",dot_image3);*/
 	/////////////////////////////////////////////////////
 
 	//Outputs to show in GUI(Tree count and tree image)
