@@ -433,6 +433,7 @@ void ImageProcessor::Process (int training_option)
 
 	//Outputs to show in GUI(Tree count and tree image)
 	type_A_no = new_count;
+	type_B_no = count;
 	output = test_image;
 
  

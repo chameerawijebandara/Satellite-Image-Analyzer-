@@ -172,17 +172,17 @@ namespace SatelliteImageAnalyzer {
 			// 
 			// textBox3
 			// 
-			this->textBox3->Location = System::Drawing::Point(209, 69);
+			this->textBox3->Location = System::Drawing::Point(261, 69);
 			this->textBox3->Name = L"textBox3";
-			this->textBox3->Size = System::Drawing::Size(69, 20);
+			this->textBox3->Size = System::Drawing::Size(69, 26);
 			this->textBox3->TabIndex = 3;
 			this->textBox3->TextChanged += gcnew System::EventHandler(this, &Main::textBox3_TextChanged);
 			// 
 			// textBox2
 			// 
-			this->textBox2->Location = System::Drawing::Point(209, 32);
+			this->textBox2->Location = System::Drawing::Point(261, 32);
 			this->textBox2->Name = L"textBox2";
-			this->textBox2->Size = System::Drawing::Size(69, 20);
+			this->textBox2->Size = System::Drawing::Size(69, 26);
 			this->textBox2->TabIndex = 2;
 			// 
 			// label2
@@ -190,18 +190,18 @@ namespace SatelliteImageAnalyzer {
 			this->label2->AutoSize = true;
 			this->label2->Location = System::Drawing::Point(26, 69);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(123, 13);
+			this->label2->Size = System::Drawing::Size(176, 20);
 			this->label2->TabIndex = 1;
-			this->label2->Text = L"Number of Type B Trees";
+			this->label2->Text = L"Number of Dicots Trees";
 			// 
 			// label1
 			// 
 			this->label1->AutoSize = true;
 			this->label1->Location = System::Drawing::Point(26, 32);
 			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(123, 13);
+			this->label1->Size = System::Drawing::Size(201, 20);
 			this->label1->TabIndex = 0;
-			this->label1->Text = L"Number of Type A Trees";
+			this->label1->Text = L"Number of Monocots Trees";
 			// 
 			// panel3
 			// 
@@ -230,7 +230,7 @@ namespace SatelliteImageAnalyzer {
 			this->numericUpDown2->Location = System::Drawing::Point(12, 395);
 			this->numericUpDown2->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) {1000000000, 0, 0, 0});
 			this->numericUpDown2->Name = L"numericUpDown2";
-			this->numericUpDown2->Size = System::Drawing::Size(96, 20);
+			this->numericUpDown2->Size = System::Drawing::Size(96, 26);
 			this->numericUpDown2->TabIndex = 16;
 			// 
 			// numericUpDown1
@@ -238,7 +238,7 @@ namespace SatelliteImageAnalyzer {
 			this->numericUpDown1->Location = System::Drawing::Point(12, 358);
 			this->numericUpDown1->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) {100000000, 0, 0, 0});
 			this->numericUpDown1->Name = L"numericUpDown1";
-			this->numericUpDown1->Size = System::Drawing::Size(96, 20);
+			this->numericUpDown1->Size = System::Drawing::Size(96, 26);
 			this->numericUpDown1->TabIndex = 15;
 			// 
 			// button4
@@ -266,7 +266,7 @@ namespace SatelliteImageAnalyzer {
 			this->label4->AutoSize = true;
 			this->label4->Location = System::Drawing::Point(117, 397);
 			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(66, 13);
+			this->label4->Size = System::Drawing::Size(98, 20);
 			this->label4->TabIndex = 12;
 			this->label4->Text = L"Tree Images";
 			// 
@@ -275,7 +275,7 @@ namespace SatelliteImageAnalyzer {
 			this->label3->AutoSize = true;
 			this->label3->Location = System::Drawing::Point(114, 362);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(68, 13);
+			this->label3->Size = System::Drawing::Size(101, 20);
 			this->label3->TabIndex = 11;
 			this->label3->Text = L"Total Images";
 			// 
@@ -283,7 +283,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			this->textBox4->Location = System::Drawing::Point(12, 326);
 			this->textBox4->Name = L"textBox4";
-			this->textBox4->Size = System::Drawing::Size(318, 20);
+			this->textBox4->Size = System::Drawing::Size(318, 26);
 			this->textBox4->TabIndex = 8;
 			// 
 			// radioButton3
@@ -291,7 +291,7 @@ namespace SatelliteImageAnalyzer {
 			this->radioButton3->AutoSize = true;
 			this->radioButton3->Location = System::Drawing::Point(174, 293);
 			this->radioButton3->Name = L"radioButton3";
-			this->radioButton3->Size = System::Drawing::Size(88, 17);
+			this->radioButton3->Size = System::Drawing::Size(124, 24);
 			this->radioButton3->TabIndex = 7;
 			this->radioButton3->TabStop = true;
 			this->radioButton3->Text = L"Use New NN";
@@ -303,7 +303,7 @@ namespace SatelliteImageAnalyzer {
 			this->radioButton1->Checked = true;
 			this->radioButton1->Location = System::Drawing::Point(29, 293);
 			this->radioButton1->Name = L"radioButton1";
-			this->radioButton1->Size = System::Drawing::Size(100, 17);
+			this->radioButton1->Size = System::Drawing::Size(145, 24);
 			this->radioButton1->TabIndex = 5;
 			this->radioButton1->TabStop = true;
 			this->radioButton1->Text = L"Use Default NN";
@@ -323,7 +323,7 @@ namespace SatelliteImageAnalyzer {
 			// 
 			this->textBox1->Location = System::Drawing::Point(12, 36);
 			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(318, 20);
+			this->textBox1->Size = System::Drawing::Size(318, 26);
 			this->textBox1->TabIndex = 1;
 			// 
 			// button1
@@ -346,6 +346,7 @@ namespace SatelliteImageAnalyzer {
 			this->Controls->Add(this->panel1);
 			this->MaximizeBox = false;
 			this->Name = L"Main";
+			this->Text = L"Tree Crown Analysis System";
 			this->panel1->ResumeLayout(false);
 			this->panel2->ResumeLayout(false);
 			this->panel2->PerformLayout();
